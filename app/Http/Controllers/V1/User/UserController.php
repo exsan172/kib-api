@@ -63,8 +63,8 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'telepon' => $request->telepon,
-                'status' => 1,
-                'password' => Hash::make('admin123')
+                'status' => $request->status ?? 1,
+                'password' => $request->password ? Hash::make($request->password) :  Hash::make('admin123')
             ]);
             // attach role
             $user->roles()->attach($request->role_id);

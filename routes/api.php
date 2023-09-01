@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\BarangController;
+use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\V1\Auth\ForgotPasswordController;
 use App\Http\Controllers\V1\Auth\LoginController;
 use App\Http\Controllers\V1\Auth\RegisterController;
@@ -60,6 +62,15 @@ Route::prefix('v1')->group(function () {
         // master/metode-penyusutan
         Route::resource('metode-penyusutan/barang', MetodePenyusutanController::class);
         Route::post('metode-penyusutan/barang/list', [MetodePenyusutanController::class, 'list']);
+    });
+
+    // master
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::resource('lokasi', LokasiController::class);
+        Route::post('lokasi/list', [LokasiController::class, 'list']);
+
+        Route::resource('barang', BarangController::class);
+        Route::post('barang/list', [BarangController::class, 'list']);
     });
 
     // user
