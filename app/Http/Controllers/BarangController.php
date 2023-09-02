@@ -193,9 +193,9 @@ class BarangController extends Controller
                         'updated_at' => Carbon::now(),
                     ];
                 }
+                FotoBarang::insert($images);
             }
 
-            FotoBarang::insert($images);
 
             LogHistoryBarang::create([
                 'user_updated' => auth()->user()->id,
