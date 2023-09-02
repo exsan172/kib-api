@@ -71,6 +71,9 @@ Route::prefix('v1')->group(function () {
 
         Route::resource('barang', BarangController::class);
         Route::post('barang/list', [BarangController::class, 'list']);
+
+        Route::resource('jadwal', JadwalPengecekanController::class);
+        Route::post('jadwal/list', [JadwalPengecekanController::class, 'list']);
     });
 
     // user
