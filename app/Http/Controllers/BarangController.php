@@ -106,7 +106,7 @@ class BarangController extends Controller
                 'user_created' => auth()->user()->id,
             ]);
 
-            if (is_array($request->images)) {
+            if (isset($request->images) && is_array($request->images)) {
                 $images  = [];
                 foreach ($request->images as $image) {
                     $file = Storage::disk('public')->put('barang', $image);
@@ -181,7 +181,7 @@ class BarangController extends Controller
 
             $barang->fotoBarang()->delete();
 
-            if (is_array($request->images)) {
+            if (isset($request->images) && is_array($request->images)) {
                 $images  = [];
                 foreach ($request->images as $image) {
                     $file = Storage::disk('public')->put('barang', $image);
