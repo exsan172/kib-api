@@ -106,19 +106,21 @@ class BarangController extends Controller
                 'user_created' => auth()->user()->id,
             ]);
 
-            $images  = [];
-            foreach ($request->images as $image) {
-                $file = Storage::disk('public')->put('barang', $image);
-                $images[] = [
-                    'uuid' => Uuid::uuid4(),
-                    'barang_id' => $barang->id,
-                    'foto_barang' => asset('storage/' . $file),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
-            }
+            if (is_array($request->images)) {
+                $images  = [];
+                foreach ($request->images as $image) {
+                    $file = Storage::disk('public')->put('barang', $image);
+                    $images[] = [
+                        'uuid' => Uuid::uuid4(),
+                        'barang_id' => $barang->id,
+                        'foto_barang' => asset('storage/' . $file),
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ];
+                }
 
-            FotoBarang::insert($images);
+                FotoBarang::insert($images);
+            }
             DB::commit();
             return response()->json([
                 'message' => 'Create Barang Success',
