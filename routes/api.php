@@ -8,6 +8,10 @@ use App\Http\Controllers\V1\Auth\LoginController;
 use App\Http\Controllers\V1\Auth\RegisterController;
 use App\Http\Controllers\V1\Master\KategoriBarangController;
 use App\Http\Controllers\V1\Master\MetodePenyusutanController;
+use App\Http\Controllers\V1\Pemindahan\HibahBarangController;
+use App\Http\Controllers\V1\Pemindahan\JualBarangController;
+use App\Http\Controllers\V1\Pemindahan\PemusnahanBarangController;
+use App\Http\Controllers\V1\Pemindahan\TukarBarangController;
 use App\Http\Controllers\V1\Sites\MenuController;
 use App\Http\Controllers\V1\Sites\RoleController;
 use App\Http\Controllers\V1\User\MenuUserController;
@@ -75,6 +79,25 @@ Route::prefix('v1')->group(function () {
 
         Route::resource('jadwal', JadwalPengecekanController::class);
         Route::post('jadwal/list', [JadwalPengecekanController::class, 'list']);
+
+        // pemindahtanganan
+        Route::prefix('pemindahan')->group(function () {
+            // jual barang
+            Route::resource('jual', JualBarangController::class);
+            Route::post('jual/list', [JualBarangController::class, 'list']);
+
+            // tukar barang
+            Route::resource('tukar', TukarBarangController::class);
+            Route::post('tukar/list', [TukarBarangController::class, 'list']);
+
+            // hibah barang
+            Route::resource('hibah', HibahBarangController::class);
+            Route::post('hibah/list', [HibahBarangController::class, 'list']);
+
+            // pemusnahan barang
+            Route::resource('pemusnahan', PemusnahanBarangController::class);
+            Route::post('pemusnahan/list', [PemusnahanBarangController::class, 'list']);
+        });
     });
 
     // user
