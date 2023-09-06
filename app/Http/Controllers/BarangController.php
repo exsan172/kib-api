@@ -73,6 +73,22 @@ class BarangController extends Controller
         ]);
     }
 
+    public function barangByBarcode($barcode)
+    {
+        $barang = Barang::where('kode_barang', $barcode)->first();
+        if ($barang) {
+            return response()->json([
+                'message' => 'Detail Barang',
+                'data' => new BarangResource($barang),
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Barang Tidak Ditemukan',
+            'data' => null,
+        ], 400);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -105,6 +121,7 @@ class BarangController extends Controller
                 'tahun_perolehan' => $request->tahun_perolehan,
                 'kondisi' => $request->kondisi,
                 'nilai_perolehan' => $request->nilai_perolehan,
+                'nilai_pertahun' => $request->nilai_pertahun,
                 'tahun_pembelian' => $request->tahun_pembelian,
                 'masa_manfaat' => $request->masa_manfaat,
                 'keterangan' => $request->keterangan,
@@ -179,6 +196,7 @@ class BarangController extends Controller
                 'tahun_perolehan' => $request->tahun_perolehan,
                 'kondisi' => $request->kondisi,
                 'nilai_perolehan' => $request->nilai_perolehan,
+                'nilai_pertahun' => $request->nilai_pertahun,
                 'tahun_pembelian' => $request->tahun_pembelian,
                 'masa_manfaat' => $request->masa_manfaat,
                 'keterangan' => $request->keterangan,
