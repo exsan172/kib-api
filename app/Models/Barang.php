@@ -16,6 +16,7 @@ class Barang extends Model
         'tahun_perolehan',
         'kondisi',
         'nilai_perolehan',
+        'nilai_pertahun',
         'tahun_pembelian',
         'masa_manfaat',
         'keterangan',
@@ -27,7 +28,7 @@ class Barang extends Model
         'user_created'
     ];
 
-    protected $appends = ['nama_kategori', 'user_created_name'];
+    protected $appends = ['nama_kategori', 'nama_penyusutan', 'user_created_name'];
 
     /**
      * Get the kategori that owns the Barang
@@ -92,6 +93,11 @@ class Barang extends Model
     public function getNamaKategoriAttribute()
     {
         return $this->kategori?->nama_kategori ?? '-';
+    }
+
+    public function getNamaPenyusutanAttribute()
+    {
+        return $this->metodePenyusutan?->nama_penyusutan ?? '-';
     }
 
     public function getUserCreatedNameAttribute()
