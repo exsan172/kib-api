@@ -62,6 +62,8 @@ class JadwalPengecekanController extends Controller
             'judul' => $request->judul,
             'keterangan' => $request->keterangan,
             'tanggal' => $request->tanggal,
+            'barang_id' => $request->barang_id,
+            'user_created' => auth()->user()->id,
         ]);
 
         return response()->json([
@@ -99,6 +101,7 @@ class JadwalPengecekanController extends Controller
             'judul' => $request->judul,
             'keterangan' => $request->keterangan,
             'tanggal' => $request->tanggal,
+            'barang_id' => $request->barang_id,
         ]);
 
         return response()->json([

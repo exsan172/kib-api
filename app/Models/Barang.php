@@ -70,6 +70,16 @@ class Barang extends Model
     }
 
     /**
+     * Get all of the jadwals for the Barang
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function jadwals()
+    {
+        return $this->hasMany(JadwalPengecekan::class, 'barang_id');
+    }
+
+    /**
      * Get all of the fotoBarang for the Barang
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

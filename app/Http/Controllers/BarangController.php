@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BarangBarcodeResource;
 use App\Http\Resources\BarangResource;
 use App\Models\Barang;
 use App\Models\FotoBarang;
@@ -60,6 +61,15 @@ class BarangController extends Controller
             'status' => 'success',
             'data' => $barangs,
             'message' => 'List barang Barang'
+        ]);
+    }
+
+    public function barcode()
+    {
+        $barangs = Barang::all();
+        return response()->json([
+            'message' => 'List Barang Data',
+            'data' => BarangBarcodeResource::collection($barangs),
         ]);
     }
 
@@ -144,7 +154,7 @@ class BarangController extends Controller
      */
     public function show($id)
     {
-        $kategori = Barang::with(['fotoBarang'])->whereUuid($id)->first();
+        $kategori = Barang::with(['fotoBarang', 'jadwals'])->whereUuid($id)->first();
         return response()->json([
             'message' => 'Barang Data',
             'data' => new BarangResource($kategori),
