@@ -129,7 +129,7 @@ class BarangController extends Controller
                 'penyusutan_barang' => $request->penyusutan_barang ?? 0,
                 'kategori_barang_id' => $request->kategori_barang_id,
                 'lokasi_id' => $request->lokasi_id,
-                'metode_penyusutan_id' => $request->metode_penyusutan_id,
+                'metode_penyusutan_id' => $request->metode_penyusutan_id ?? 0,
                 'user_created' => auth()->user()->id,
             ]);
 
