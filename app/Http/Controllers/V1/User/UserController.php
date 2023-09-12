@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
 
 class UserController extends Controller
@@ -58,14 +59,22 @@ class UserController extends Controller
         try {
             DB::beginTransaction();
 
-            $user = User::create([
+            $dataUser = [
                 'uuid' => Uuid::uuid4(),
                 'name' => $request->name,
                 'email' => $request->email,
                 'telepon' => $request->telepon,
                 'status' => $request->status ?? 1,
                 'password' => $request->password ? Hash::make($request->password) :  Hash::make('admin123')
-            ]);
+            ];
+
+            if ($request->profile_image) {
+                $file = Storage::disk('public')->put('profile', $request->profile_image);
+                $dataUser['profile_image'] = asset('storage/' . $file);
+            }
+
+
+            $user = User::create($dataUser);
             // attach role
             $user->roles()->attach($request->role_id);
 
@@ -116,6 +125,11 @@ class UserController extends Controller
                 $data['password'] =  Hash::make($request->password);
             }
 
+            if ($request->profile_image) {
+                $file = Storage::disk('public')->put('profile', $request->profile_image);
+                $dataUser['profile_image'] = asset('storage/' . $file);
+            }
+
             $user->update($data);
 
             // update role
@@ -141,12 +155,22 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        $user = User::whereUuid($id)->first();
-        $user->delete();
-
-        return response()->json([
-            'message' => 'Delete User Success',
-            'data' => new UserResource($user),
-        ]);
+        try {
+            DB::beginTransaction();
+            $user = User::whereUuid($id)->first();
+            $user->roles()->detach();
+            $user->delete();
+            DB::commit();
+            return response()->json([
+                'message' => 'Delete User Success',
+                'data' => new UserResource($user),
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Delete User Error',
+                'data' => null,
+            ], 400);
+        }
     }
 }

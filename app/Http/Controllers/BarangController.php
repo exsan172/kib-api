@@ -269,7 +269,23 @@ class BarangController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'Delete Barang Error',
+            ], 400);
+        }
+    }
+
+    function deleteFoto($foto_id)
+    {
+        $foto = FotoBarang::whereUuid($foto_id);
+
+        if ($foto) {
+            $foto->delete();
+            return response()->json([
+                'message' => 'Delete Photo Success',
             ]);
         }
+
+        return response()->json([
+            'message' => 'Delete Photo Error',
+        ], 400);
     }
 }

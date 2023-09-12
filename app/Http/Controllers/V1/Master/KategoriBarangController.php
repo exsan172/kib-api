@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\KategoriBarangResource;
 use App\Models\KategoriBarang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
 class KategoriBarangController extends Controller
@@ -112,11 +113,20 @@ class KategoriBarangController extends Controller
      */
     public function destroy($id)
     {
-        $kategori = KategoriBarang::whereUuid($id)->first();
-        $kategori->delete();
+        try {
+            DB::beginTransaction();
+            $kategori = KategoriBarang::whereUuid($id)->first();
+            $kategori->delete();
 
-        return response()->json([
-            'message' => 'Delete Category Barang Success',
-        ]);
+            DB::commit();
+            return response()->json([
+                'message' => 'Delete Category Barang Success',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return response()->json([
+                'message' => 'Delete Category Barang Error',
+            ], 400);
+        }
     }
 }

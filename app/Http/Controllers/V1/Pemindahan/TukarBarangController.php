@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\PemindahanBarangResource;
 use App\Models\PemindahanBarang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
 class TukarBarangController extends Controller
@@ -115,11 +116,20 @@ class TukarBarangController extends Controller
      */
     public function destroy($id)
     {
-        $barangJual = PemindahanBarang::whereUuid($id)->first();
-        $barangJual->delete();
+        try {
+            DB::beginTransaction();
+            $tukar = PemindahanBarang::whereUuid($id)->first();
+            $tukar->delete();
 
-        return response()->json([
-            'message' => 'Delete Tukar Barang Success',
-        ]);
+            DB::commit();
+            return response()->json([
+                'message' => 'Delete Tukar Barang Success',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return response()->json([
+                'message' => 'Delete Tukar Barang Error',
+            ], 400);
+        }
     }
 }

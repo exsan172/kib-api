@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Barang extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = 'barang';
     protected $fillable = [
         'uuid',
@@ -28,7 +29,8 @@ class Barang extends Model
         'user_created'
     ];
 
-    protected $appends = ['nama_kategori', 'nama_penyusutan', 'user_created_name'];
+    protected $appends = ['nama_kategori', 'nama_penyusutan', 'user_created_name', 'riwayat_pengecekan'];
+    protected $with = ['fotoBarang'];
 
     /**
      * Get the kategori that owns the Barang
@@ -71,6 +73,16 @@ class Barang extends Model
     }
 
     /**
+     * Get all of the logHistory for the Barang
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function lokasi()
+    {
+        return $this->hasMany(Lokasi::class, 'lokasi_id');
+    }
+
+    /**
      * Get all of the jadwals for the Barang
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -93,6 +105,10 @@ class Barang extends Model
     public function getNamaKategoriAttribute()
     {
         return $this->kategori?->nama_kategori ?? '-';
+    }
+    public function getRiwayatPengecekanAttribute()
+    {
+        return $this->jadwals;
     }
 
     public function getNamaPenyusutanAttribute()

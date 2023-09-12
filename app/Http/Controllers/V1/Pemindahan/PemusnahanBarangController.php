@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\PemindahanBarangResource;
 use App\Models\PemindahanBarang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
 class PemusnahanBarangController extends Controller
@@ -111,11 +112,20 @@ class PemusnahanBarangController extends Controller
      */
     public function destroy($id)
     {
-        $barangPemusnahan = PemindahanBarang::whereUuid($id)->first();
-        $barangPemusnahan->delete();
+        try {
+            DB::beginTransaction();
+            $pemusnahan = PemindahanBarang::whereUuid($id)->first();
+            $pemusnahan->delete();
 
-        return response()->json([
-            'message' => 'Delete Pemusnahan Barang Success',
-        ]);
+            DB::commit();
+            return response()->json([
+                'message' => 'Delete Pemusnahan Barang Success',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return response()->json([
+                'message' => 'Delete Pemusnahan Barang Error',
+            ], 400);
+        }
     }
 }

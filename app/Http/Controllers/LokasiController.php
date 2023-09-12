@@ -22,7 +22,7 @@ class LokasiController extends Controller
             });
         }
 
-        $lokasis = $lokasi->paginate($request->perpage ?? 10);
+        $lokasis = $lokasi->whereNull('parent_id')->paginate($request->perpage ?? 10);
         return response()->json([
             'status' => 'success',
             'data' => $lokasis,
@@ -127,7 +127,7 @@ class LokasiController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'Delete lokasi Error',
-            ]);
+            ], 400);
         }
     }
 }

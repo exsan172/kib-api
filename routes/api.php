@@ -3,6 +3,7 @@
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\JadwalPengecekanController;
 use App\Http\Controllers\LokasiController;
+use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\V1\Auth\ForgotPasswordController;
 use App\Http\Controllers\V1\Auth\LoginController;
 use App\Http\Controllers\V1\Auth\RegisterController;
@@ -76,6 +77,7 @@ Route::prefix('v1')->group(function () {
 
         Route::resource('barang', BarangController::class);
         Route::post('barang/list', [BarangController::class, 'list']);
+        Route::delete('barang/delete-foto/{foto_id}', [BarangController::class, 'deleteFoto']);
         Route::get('barang/barcode', [BarangController::class, 'barcode']);
         Route::get('barang/barcode/{barcode}', [BarangController::class, 'barangByBarcode']);
 
@@ -109,5 +111,13 @@ Route::prefix('v1')->group(function () {
         // contact
         Route::resource('contact', UserController::class);
         Route::post('contact/list', [UserController::class, 'list']);
+    });
+
+    Route::get('dashboard', [UserProfileController::class, 'dashboard'])->middleware('auth:sanctum');
+    Route::prefix('account')->middleware('auth:sanctum')->group(function () {
+        // profile
+        Route::get('user/profile', [UserProfileController::class, 'getUserProfile']);
+        Route::post('user/profile', [UserProfileController::class, 'updateProfile']);
+        Route::post('user/password', [UserProfileController::class, 'updatePassword']);
     });
 });

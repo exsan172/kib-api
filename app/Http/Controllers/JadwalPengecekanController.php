@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\JadwalPengecekanResource;
 use App\Models\JadwalPengecekan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
 class JadwalPengecekanController extends Controller
@@ -118,11 +119,19 @@ class JadwalPengecekanController extends Controller
      */
     public function destroy($id)
     {
-        $jadwal = JadwalPengecekan::whereUuid($id)->first();
-        $jadwal->delete();
-
-        return response()->json([
-            'message' => 'Delete Jadwal pengecekan Success',
-        ]);
+        try {
+            DB::beginTransaction();
+            $jadwal = JadwalPengecekan::whereUuid($id)->first();
+            $jadwal->delete();
+            DB::commit();
+            return response()->json([
+                'message' => 'Delete Jadwal pengecekan Success',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Delete Jadwal pengecekan Error',
+            ], 400);
+        }
     }
 }
