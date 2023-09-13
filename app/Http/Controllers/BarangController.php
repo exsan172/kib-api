@@ -69,7 +69,7 @@ class BarangController extends Controller
         $barangs = Barang::paginate(10);
         return response()->json([
             'message' => 'List Barang Data',
-            'data' => BarangBarcodeResource::collection($barangs),
+            'data' => $barangs,
         ]);
     }
 
