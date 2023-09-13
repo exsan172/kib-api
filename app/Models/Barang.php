@@ -106,9 +106,10 @@ class Barang extends Model
     {
         return $this->kategori?->nama_kategori ?? '-';
     }
+
     public function getRiwayatPengecekanAttribute()
     {
-        return $this->jadwals;
+        return $this->jadwals()->get();
     }
 
     public function getNamaPenyusutanAttribute()
