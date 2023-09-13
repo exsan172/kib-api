@@ -16,13 +16,13 @@ class FotoBarang extends Model
         'barang_id',
     ];
 
-    /**
-     * Get the barang that owns the FotoBarang
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function barang()
-    {
-        return $this->belongsTo(Barang::class, 'barang_id');
-    }
+    // /**
+    //  * Get the barang that owns the FotoBarang
+    //  *
+    //  * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+    //  */
+    // public function barang()
+    // {
+    //     return $this->belongsTo(Barang::class, 'barang_id');
+    // }
 }
