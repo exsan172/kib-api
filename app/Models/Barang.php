@@ -30,7 +30,7 @@ class Barang extends Model
     ];
 
     protected $appends = ['nama_kategori', 'nama_penyusutan', 'user_created_name'];
-    // protected $with = ['fotoBarang', 'riwayatPengecekan'];
+    protected $with = ['fotoBarang', 'riwayatPengecekan'];
 
     /**
      * Get the kategori that owns the Barang

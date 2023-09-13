@@ -20,15 +20,15 @@ class JadwalPengecekan extends Model
 
     protected $appends = ['nama_barang', 'user_created_name'];
 
-    /**
-     * Get the barang that owns the PemindahanBarang
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function barang()
-    {
-        return $this->belongsTo(Barang::class, 'barang_id');
-    }
+    // /**
+    //  * Get the barang that owns the PemindahanBarang
+    //  *
+    //  * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+    //  */
+    // public function barang()
+    // {
+    //     return $this->belongsTo(Barang::class, 'barang_id');
+    // }
 
     /**
      * Get the user that owns the PemindahanBarang
@@ -42,8 +42,9 @@ class JadwalPengecekan extends Model
 
     public function getNamaBarangAttribute()
     {
-        if ($this->barang) {
-            return $this->barang?->nama_barang ?? '-';
+        $barang = Barang::find($this->barang_id);
+        if ($barang) {
+            return $barang?->nama_barang ?? '-';
         }
         return '-';
     }
