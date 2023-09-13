@@ -66,10 +66,10 @@ class BarangController extends Controller
 
     public function barcode()
     {
-        $barangs = Barang::paginate(10);
+        $barangs = Barang::all();
         return response()->json([
             'message' => 'List Barang Data',
-            'data' => $barangs,
+            'data' => BarangBarcodeResource::collection($barangs),
         ]);
     }
 
@@ -96,10 +96,10 @@ class BarangController extends Controller
      */
     public function index()
     {
-        $barangs = Barang::all();
+        $barangs = Barang::query()->paginate(10);
         return response()->json([
             'message' => 'Barang Data',
-            'data' => BarangResource::collection($barangs),
+            'data' => $barangs,
         ]);
     }
 
