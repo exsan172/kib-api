@@ -15,7 +15,7 @@ class LokasiController extends Controller
         // list all
         $search = $request->search;
 
-        $lokasi =  Lokasi::query();
+        $lokasi =  Lokasi::query()->with('children');
         if ($search) {
             $lokasi->where(function ($query) use ($search) {
                 $query->where('nama_lokasi', 'like', "%$search%");
