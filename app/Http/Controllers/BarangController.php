@@ -66,7 +66,7 @@ class BarangController extends Controller
 
     public function barcode()
     {
-        $barangs = Barang::all();
+        $barangs = Barang::paginate(10);
         return response()->json([
             'message' => 'List Barang Data',
             'data' => BarangBarcodeResource::collection($barangs),
