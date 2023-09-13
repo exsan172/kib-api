@@ -42,7 +42,10 @@ class JadwalPengecekan extends Model
 
     public function getNamaBarangAttribute()
     {
-        return $this->barang?->nama_barang ?? '-';
+        if ($this->barang) {
+            return $this->barang?->nama_barang ?? '-';
+        }
+        return '-';
     }
 
     public function getUserCreatedNameAttribute()
