@@ -30,7 +30,7 @@ class Barang extends Model
     ];
 
     protected $appends = ['nama_kategori', 'nama_penyusutan', 'user_created_name'];
-    protected $with = ['fotoBarang', 'riwayatPengecekan'];
+    // protected $with = ['fotoBarang', 'riwayatPengecekan'];
 
     /**
      * Get the kategori that owns the Barang
@@ -109,7 +109,7 @@ class Barang extends Model
      */
     public function fotoBarang()
     {
-        return $this->hasMany(FotoBarang::class);
+        return $this->hasMany(FotoBarang::class, 'barang_id');
     }
 
     public function getNamaKategoriAttribute()
