@@ -79,7 +79,7 @@ class Barang extends Model
      */
     public function lokasi()
     {
-        return $this->hasMany(Lokasi::class, 'lokasi_id');
+        return $this->belongsTo(Lokasi::class);
     }
 
     /**
