@@ -149,6 +149,7 @@ class BarangController extends Controller
                 FotoBarang::insert($images);
             }
             DB::commit();
+
             return response()->json([
                 'message' => 'Create Barang Success',
                 'data' => new BarangResource($barang),
@@ -190,6 +191,7 @@ class BarangController extends Controller
         try {
             DB::beginTransaction();
             $barang = Barang::whereUuid($id)->first();
+            $newBarang = $barang;
             $barang->update([
                 'nama_barang' => $request->nama_barang,
                 'kode_barang' => $request->kode_barang,
@@ -207,9 +209,9 @@ class BarangController extends Controller
                 'metode_penyusutan_id' => $request->metode_penyusutan_id,
             ]);
 
-            $barang->fotoBarang()->delete();
 
             if (isset($request->images) && is_array($request->images)) {
+                $barang->fotoBarang()->delete();
                 $images  = [];
                 foreach ($request->images as $image) {
                     $file = Storage::disk('public')->put('barang', $image);
@@ -224,7 +226,6 @@ class BarangController extends Controller
                 FotoBarang::insert($images);
             }
 
-
             LogHistoryBarang::create([
                 'user_updated' => auth()->user()->id,
                 'barang_id' => $barang->id,
@@ -232,9 +233,10 @@ class BarangController extends Controller
             ]);
 
             DB::commit();
+
             return response()->json([
                 'message' => 'Update Barang Success',
-                'data' => new BarangResource($barang),
+                'data' => new BarangResource($newBarang),
             ]);
         } catch (\Throwable $th) {
             DB::rollBack();
