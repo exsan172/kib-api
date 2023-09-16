@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\LokasiResource;
+use App\Models\Barang;
 use App\Models\Lokasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -118,7 +119,15 @@ class LokasiController extends Controller
         try {
             DB::beginTransaction();
             $lokasi = Lokasi::whereUuid($id)->first();
-            $lokasi->delete();
+
+            $barang = Barang::where('lokasi_id', $lokasi->id)->first();
+            if ($barang) {
+                return response()->json([
+                    'message' => 'Lokasi Gagal Dihapus, karna masih memiliki barang',
+                ], 400);
+            } else {
+                $lokasi->delete();
+            }
             DB::commit();
             return response()->json([
                 'message' => 'Delete lokasi Success',
