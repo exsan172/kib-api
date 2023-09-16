@@ -32,13 +32,13 @@ class Lokasi extends Model
         return $this->hasMany(Lokasi::class, 'parent_id')->with('children')->orderBy('created_at', 'ASC');
     }
 
-    /**
-     * Get all of the barang for the Lokasi
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function barang()
-    {
-        return $this->hasMany(Barang::class, 'lokasi_id');
-    }
+    // /**
+    //  * Get all of the barang for the Lokasi
+    //  *
+    //  * @return \Illuminate\Database\Eloquent\Relations\HasMany
+    //  */
+    // public function barang()
+    // {
+    //     return $this->hasMany(Barang::class, 'lokasi_id');
+    // }
 }
