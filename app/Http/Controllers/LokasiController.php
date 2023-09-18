@@ -35,7 +35,7 @@ class LokasiController extends Controller
      */
     public function index()
     {
-        $lokasis = Lokasi::whereNull('parent_id')->paginate(10);
+        $lokasis = Lokasi::whereNull('parent_id')->get();
         return response()->json([
             'message' => 'Lokasi Data',
             'data' => $lokasis,
