@@ -16,6 +16,7 @@ class DataBarang implements FromCollection, WithHeadings
         return Barang::select(
             'nama_barang',
             'kode_barang',
+            'kode_barang_resmi',
             'tahun_perolehan',
             'kondisi',
             'nilai_perolehan',
@@ -37,7 +38,8 @@ class DataBarang implements FromCollection, WithHeadings
     {
         return [
             'Nama Barang',         
-            'Kode Barang',         
+            'Kode Barang',    
+            'kode Barang Resmi',     
             'Tahun Perolehan',     
             'Kondisi',             
             'Nilai Perolehan',     

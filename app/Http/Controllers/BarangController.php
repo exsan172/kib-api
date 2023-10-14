@@ -51,23 +51,24 @@ class BarangController extends Controller
 
                     $row            = $data[0][$i];
                     $barang         = Barang::firstOrNew(['kode_barang' => $row[1]]);
-                    $kategori       = KategoriBarang::where('nama_kategori', strtolower($row[8]))->first();
-                    $lokasi         = Lokasi::where('nama_lokasi', strtolower($row[9]))->first();
-                    $metode         = MetodePenyusutan::where('nama_penyusutan', strtolower($row[10]))->first();
-                    $nilai_pertahun = strtolower($row[11]) != "garis lurus" ? (intval($row[4])/2)/intval($row[6]) : (intval($row[4])/intval($row[6]));
+                    $kategori       = KategoriBarang::where('nama_kategori', strtolower($row[9]))->first();
+                    $lokasi         = Lokasi::where('nama_lokasi', strtolower($row[10]))->first();
+                    $metode         = MetodePenyusutan::where('nama_penyusutan', strtolower($row[11]))->first();
+                    $nilai_pertahun = strtolower($row[11]) != "garis lurus" ? (intval($row[5])/2)/intval($row[7]) : (intval($row[5])/intval($row[7]));
 
                     if (!$barang->exists) {
                         Barang::create([
                             'uuid'                   => Uuid::uuid4(),
                             'nama_barang'            => $row[0],
                             'kode_barang'            => $row[1],
-                            'tahun_perolehan'        => $row[2],
-                            'kondisi'                => $row[3],
-                            'nilai_perolehan'        => $row[4],
+                            'kode_barang_resmi'      => $row[2],
+                            'tahun_perolehan'        => $row[3],
+                            'kondisi'                => $row[4],
+                            'nilai_perolehan'        => $row[5],
                             'nilai_pertahun'         => $nilai_pertahun,
-                            'tahun_pembelian'        => $row[5],
-                            'masa_manfaat'           => $row[6],
-                            'keterangan'             => $row[7],
+                            'tahun_pembelian'        => $row[6],
+                            'masa_manfaat'           => $row[7],
+                            'keterangan'             => $row[8],
                             'kategori_barang_id'     => $kategori ? $kategori->id : null,
                             'lokasi_id'              => $lokasi ? $lokasi->id : null,
                             'metode_penyusutan_id'   => $metode ? $metode->id : null,
