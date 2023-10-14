@@ -5,16 +5,120 @@ namespace App\Http\Controllers;
 use App\Http\Resources\BarangBarcodeResource;
 use App\Http\Resources\BarangResource;
 use App\Models\Barang;
+use App\Models\KategoriBarang;
+use App\Models\MetodePenyusutan;
+use App\Models\Lokasi;
 use App\Models\FotoBarang;
 use App\Models\LogHistoryBarang;
+use App\Exports\DataBarang;
+
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class BarangController extends Controller
 {
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function importDataBarang(Request $request)
+    {
+        try {
+            if ($request->hasFile('document_barang')) {
+                
+                $file      = $request->file('document_barang');
+                $extension = $file->getClientOriginalExtension();
+
+                if ($extension != 'csv' && $extension != 'xlsx') {
+                    return response()->json([
+                        'message' => 'File harus berupa CSV atau Excel.'
+                    ], 400);
+                }
+
+                DB::beginTransaction();
+
+                $data    = Excel::toCollection(null, $file);
+                $rowData = [];
+
+                for ($i = 1; $i < count($data[0]); $i++) {
+
+                    $row            = $data[0][$i];
+                    $barang         = Barang::firstOrNew(['kode_barang' => $row[1]]);
+                    $kategori       = KategoriBarang::where('nama_kategori', strtolower($row[8]))->first();
+                    $lokasi         = Lokasi::where('nama_lokasi', strtolower($row[9]))->first();
+                    $metode         = MetodePenyusutan::where('nama_penyusutan', strtolower($row[10]))->first();
+                    $nilai_pertahun = strtolower($row[11]) != "garis lurus" ? (intval($row[4])/2)/intval($row[6]) : (intval($row[4])/intval($row[6]));
+
+                    if (!$barang->exists) {
+                        Barang::create([
+                            'uuid'                   => Uuid::uuid4(),
+                            'nama_barang'            => $row[0],
+                            'kode_barang'            => $row[1],
+                            'tahun_perolehan'        => $row[2],
+                            'kondisi'                => $row[3],
+                            'nilai_perolehan'        => $row[4],
+                            'nilai_pertahun'         => $nilai_pertahun,
+                            'tahun_pembelian'        => $row[5],
+                            'masa_manfaat'           => $row[6],
+                            'keterangan'             => $row[7],
+                            'kategori_barang_id'     => $kategori ? $kategori->id : null,
+                            'lokasi_id'              => $lokasi ? $lokasi->id : null,
+                            'metode_penyusutan_id'   => $metode ? $metode->id : null,
+                            'user_created'           => auth()->user()->id,
+                        ]);
+                    }
+                }
+
+                DB::commit();
+                return response()->json([
+                    'message' => 'Import Data Barang Success',
+                ]);
+
+            } else {
+
+                return response()->json([
+                    'message' => 'File tidak di temukan'
+                ], 400);
+            }
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Import Data Barang Error',
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function exportDataBarang(Request $request)
+    {
+        try {
+            $export   = new DataBarang();
+            $fileName = 'data_barang.xlsx';
+
+            return Excel::download($export, $fileName);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => 'Export Data Barang Error',
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     public function list(Request $request)
     {
         // list all

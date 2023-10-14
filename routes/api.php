@@ -75,11 +75,13 @@ Route::prefix('v1')->group(function () {
         Route::resource('lokasi', LokasiController::class);
         Route::post('lokasi/list', [LokasiController::class, 'list']);
 
-        Route::resource('barang', BarangController::class);
         Route::post('barang/list', [BarangController::class, 'list']);
+        Route::post('barang/import', [BarangController::class, 'importDataBarang']);
+        Route::get('barang/export', [BarangController::class, 'exportDataBarang']);
         Route::delete('barang/delete-foto/{foto_id}', [BarangController::class, 'deleteFoto']);
         Route::get('barang/barcode', [BarangController::class, 'barcode']);
         Route::get('barang/barcode/{barcode}', [BarangController::class, 'barangByBarcode']);
+        Route::resource('barang', BarangController::class);
 
         Route::resource('jadwal', JadwalPengecekanController::class);
         Route::post('jadwal/list', [JadwalPengecekanController::class, 'list']);
