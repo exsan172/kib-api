@@ -15,7 +15,15 @@
     </style>
 </head>
 <body>
-    <h1>Data Barang</h1>
+    <center>
+        {{-- <img src="{{ asset('images/logo.png') }}" alt="logo"> --}}
+        <h1>
+            Biro Umum Setda Jabar
+        </h1>
+        <i>Jl lorem ipsum no 20, rt00</i>
+    </center>
+    <br/>
+    <br/>
     <table>
         <thead>
             <tr>
