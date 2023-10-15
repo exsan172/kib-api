@@ -169,6 +169,8 @@ class BarangController extends Controller
             }
 
             $pdf = PDF::loadView('template_pdf', ['data' => $barang->get()]);
+            $pdf->setPaper('a4', 'landscape');
+            
             return $pdf->download('data-barang.pdf');
 
         } catch (\Throwable $th) {
