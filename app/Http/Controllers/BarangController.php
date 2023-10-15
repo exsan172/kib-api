@@ -210,7 +210,7 @@ class BarangController extends Controller
         }
 
         if($tahun_perolehan) {
-            $barang->where('tahun_perolehan', $tahun_perolehan);
+            $barang->where('tahun_perolehan', intval($tahun_perolehan));
         }
 
         if ($status) {
