@@ -17,6 +17,7 @@ use App\Http\Controllers\V1\Sites\MenuController;
 use App\Http\Controllers\V1\Sites\RoleController;
 use App\Http\Controllers\V1\User\MenuUserController;
 use App\Http\Controllers\V1\User\UserController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -77,10 +78,12 @@ Route::prefix('v1')->group(function () {
 
         Route::post('barang/list', [BarangController::class, 'list']);
         Route::post('barang/import', [BarangController::class, 'importDataBarang']);
+        Route::post('barang/print', [BarangController::class, 'printDataBarang']);
         Route::get('barang/export', [BarangController::class, 'exportDataBarang']);
         Route::delete('barang/delete-foto/{foto_id}', [BarangController::class, 'deleteFoto']);
         Route::get('barang/barcode', [BarangController::class, 'barcode']);
         Route::get('barang/barcode/{barcode}', [BarangController::class, 'barangByBarcode']);
+        Route::get('barang/history-update/{id}', [BarangController::class, 'historyUpdateBarang']);
         Route::resource('barang', BarangController::class);
 
         Route::resource('jadwal', JadwalPengecekanController::class);
@@ -116,6 +119,7 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('dashboard', [UserProfileController::class, 'dashboard'])->middleware('auth:sanctum');
+    Route::get('dashboard/data', [DashboardController::class, 'dashboardData'])->middleware('auth:sanctum');
     Route::prefix('account')->middleware('auth:sanctum')->group(function () {
         // profile
         Route::get('user/profile', [UserProfileController::class, 'getUserProfile']);

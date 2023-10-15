@@ -12,6 +12,7 @@ use App\Models\FotoBarang;
 use App\Models\LogHistoryBarang;
 use App\Exports\DataBarang;
 
+use PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -120,29 +121,94 @@ class BarangController extends Controller
         }
     }
 
+    public function printDataBarang(Request $request)
+    {
+        try {
+            $search               = $request->search;
+            $status               = $request->status;
+            $kategori_barang_id   = $request->kategori_barang_id;
+            $lokasi_id            = $request->lokasi_id;
+            $metode_penyusutan_id = $request->metode_penyusutan_id;
+            $tahun_perolehan      = $request->tahun_perolehan;
+            $kondisi              = $request->kondisi;
+
+            $barang =  Barang::query();
+            if ($search) {
+                $barang->where(function ($query) use ($search) {
+                    $query->where('nama_barang', 'like', "%$search%");
+                    $query->orWhere('kode_barang', 'like', "%$search%");
+                    $query->orWhere('nilai_perolehan', 'like', "%$search%");
+                    $query->orWhere('tahun_pembelian', 'like', "%$search%");
+                    $query->orWhere('masa_manfaat', 'like', "%$search%");
+                    $query->orWhere('keterangan', 'like', "%$search%");
+                });
+            }
+
+            if($kondisi) {
+                $barang->where('kondisi', $kondisi);
+            }
+
+            if($tahun_perolehan) {
+                $barang->where('tahun_perolehan', $tahun_perolehan);
+            }
+
+            if ($status) {
+                $barang->where('status', $status);
+            }
+
+            if ($kategori_barang_id) {
+                $barang->where('kategori_barang_id', $kategori_barang_id);
+            }
+
+            if ($lokasi_id) {
+                $barang->where('lokasi_id', $lokasi_id);
+            }
+
+            if ($metode_penyusutan_id) {
+                $barang->where('metode_penyusutan_id', $metode_penyusutan_id);
+            }
+
+            $pdf = PDF::loadView('template_pdf', ['data' => $barang->get()]);
+            return $pdf->download('data-barang.pdf');
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => 'Export Data Barang Error',
+                'error' => $th->getMessage()
+            ], 400);
+        }
+    }
+
     public function list(Request $request)
     {
         // list all
-        $search = $request->search;
-        $status = $request->status;
-        $kategori_barang_id = $request->kategori_barang_id;
-        $lokasi_id = $request->lokasi_id;
+        $search               = $request->search;
+        $status               = $request->status;
+        $kategori_barang_id   = $request->kategori_barang_id;
+        $lokasi_id            = $request->lokasi_id;
         $metode_penyusutan_id = $request->metode_penyusutan_id;
+        $tahun_perolehan      = $request->tahun_perolehan;
+        $kondisi              = $request->kondisi;
+        $pages                = $request->pagesl;
+
         $barang =  Barang::query();
         if ($search) {
             $barang->where(function ($query) use ($search) {
                 $query->where('nama_barang', 'like', "%$search%");
                 $query->orWhere('kode_barang', 'like', "%$search%");
-                $query->orWhere('tahun_perolehan', 'like', "%$search%");
-                $query->orWhere('kondisi', 'like', "%$search%");
                 $query->orWhere('nilai_perolehan', 'like', "%$search%");
                 $query->orWhere('tahun_pembelian', 'like', "%$search%");
                 $query->orWhere('masa_manfaat', 'like', "%$search%");
                 $query->orWhere('keterangan', 'like', "%$search%");
-                $query->orWhereHas('kategori', function ($query) use ($search) {
-                    return  $query->where('nama_kategori', 'like', "%$search%");
-                });
             });
+        }
+
+        if($kondisi) {
+            $barang->where('kondisi', $kondisi);
+        }
+
+        if($tahun_perolehan) {
+            $barang->where('tahun_perolehan', $tahun_perolehan);
         }
 
         if ($status) {
@@ -161,7 +227,7 @@ class BarangController extends Controller
             $barang->where('metode_penyusutan_id', $metode_penyusutan_id);
         }
 
-        $barangs = $barang->paginate($request->perpage ?? 10);
+        $barangs = $barang->paginate($request->perpage ?? 10, ['*'], 'pages', $pages);
         return response()->json([
             'status' => 'success',
             'data' => $barangs,
@@ -350,6 +416,30 @@ class BarangController extends Controller
                 'data' => '',
                 'error' => $th->getMessage(),
                 'request' => $request->all()
+            ], 400);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function historyUpdateBarang(Request $request, $id)
+    {
+        try {
+            $dataHistory = LogHistoryBarang::where("barang_id", 1);
+            return response()->json([
+                'message' => 'Get history update barang success',
+                'data' => $dataHistory->get(),
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => 'History update barang Error',
+                'error' => $th->getMessage(),
             ], 400);
         }
     }
