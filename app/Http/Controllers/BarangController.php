@@ -170,7 +170,7 @@ class BarangController extends Controller
 
             $pdf = PDF::loadView('template_pdf', ['data' => $barang->get()]);
             $pdf->setPaper('a4', 'landscape');
-            
+
             return $pdf->download('data-barang.pdf');
 
         } catch (\Throwable $th) {
@@ -432,7 +432,7 @@ class BarangController extends Controller
     public function historyUpdateBarang(Request $request, $id)
     {
         try {
-            $dataHistory = LogHistoryBarang::where("barang_id", 1);
+            $dataHistory = LogHistoryBarang::where("barang_id", $id);
             return response()->json([
                 'message' => 'Get history update barang success',
                 'data' => $dataHistory->get(),
