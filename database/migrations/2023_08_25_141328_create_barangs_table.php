@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('nama_barang');
             $table->string('kode_barang', 50);
             $table->string('kode_barang_resmi', 20)->nullable();
-            $table->year('tahun_perolehan');
             $table->string('kondisi')->default('baik');
             $table->string('nilai_perolehan')->nullable();
             $table->string('tahun_pembelian')->nullable();

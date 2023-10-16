@@ -52,10 +52,10 @@ class BarangController extends Controller
 
                     $row            = $data[0][$i];
                     $barang         = Barang::firstOrNew(['kode_barang' => $row[1]]);
-                    $kategori       = KategoriBarang::where('nama_kategori', strtolower($row[9]))->first();
-                    $lokasi         = Lokasi::where('nama_lokasi', strtolower($row[10]))->first();
-                    $metode         = MetodePenyusutan::where('nama_penyusutan', strtolower($row[11]))->first();
-                    $nilai_pertahun = strtolower($row[11]) != "garis lurus" ? (intval($row[5])/2)/intval($row[7]) : (intval($row[5])/intval($row[7]));
+                    $kategori       = $row[8];
+                    $lokasi         = $row[9];
+                    $metode         = MetodePenyusutan::where('nama_penyusutan', strtolower($row[10]))->first();
+                    $nilai_pertahun = strtolower($metode->nama_penyusutan) != "garis lurus" ? (intval($row[4])/2)/intval($row[6]) : (intval($row[4])/intval($row[6]));
 
                     if (!$barang->exists) {
                         Barang::create([
@@ -63,15 +63,14 @@ class BarangController extends Controller
                             'nama_barang'            => $row[0],
                             'kode_barang'            => $row[1],
                             'kode_barang_resmi'      => $row[2],
-                            'tahun_perolehan'        => $row[3],
-                            'kondisi'                => $row[4],
-                            'nilai_perolehan'        => $row[5],
+                            'kondisi'                => $row[3],
+                            'nilai_perolehan'        => $row[4],
                             'nilai_pertahun'         => $nilai_pertahun,
-                            'tahun_pembelian'        => $row[6],
-                            'masa_manfaat'           => $row[7],
-                            'keterangan'             => $row[8],
-                            'kategori_barang_id'     => $kategori ? $kategori->id : null,
-                            'lokasi_id'              => $lokasi ? $lokasi->id : null,
+                            'tahun_pembelian'        => $row[5],
+                            'masa_manfaat'           => $row[6],
+                            'keterangan'             => $row[7],
+                            'kategori_barang_id'     => $kategori,
+                            'lokasi_id'              => $lokasi,
                             'metode_penyusutan_id'   => $metode ? $metode->id : null,
                             'user_created'           => auth()->user()->id,
                         ]);
@@ -138,7 +137,6 @@ class BarangController extends Controller
                     $query->where('nama_barang', 'like', "%$search%");
                     $query->orWhere('kode_barang', 'like', "%$search%");
                     $query->orWhere('nilai_perolehan', 'like', "%$search%");
-                    $query->orWhere('tahun_pembelian', 'like', "%$search%");
                     $query->orWhere('masa_manfaat', 'like', "%$search%");
                     $query->orWhere('keterangan', 'like', "%$search%");
                 });
@@ -149,7 +147,7 @@ class BarangController extends Controller
             }
 
             if($tahun_perolehan) {
-                $barang->where('tahun_perolehan', $tahun_perolehan);
+                $barang->where('tahun_pembelian', $tahun_perolehan);
             }
 
             if ($status) {
@@ -210,7 +208,7 @@ class BarangController extends Controller
         }
 
         if($tahun_perolehan) {
-            $barang->where('tahun_perolehan', intval($tahun_perolehan));
+            $barang->where('tahun_pembelian', intval($tahun_perolehan));
         }
 
         if ($status) {
@@ -229,6 +227,7 @@ class BarangController extends Controller
             $barang->where('metode_penyusutan_id', $metode_penyusutan_id);
         }
 
+        $barang->orderBy('created_at', 'desc');
         $barangs = $barang->paginate($request->perpage ?? 10, ['*'], 'pages', $pages);
         return response()->json([
             'status' => 'success',
@@ -291,7 +290,6 @@ class BarangController extends Controller
                 'uuid' => Uuid::uuid4(),
                 'nama_barang' => $request->nama_barang,
                 'kode_barang' => $request->kode_barang,
-                'tahun_perolehan' => $request->tahun_perolehan,
                 'kondisi' => $request->kondisi,
                 'nilai_perolehan' => $request->nilai_perolehan,
                 'nilai_pertahun' => $request->nilai_pertahun,
@@ -368,7 +366,6 @@ class BarangController extends Controller
             $barang->update([
                 'nama_barang' => $request->nama_barang,
                 'kode_barang' => $request->kode_barang,
-                'tahun_perolehan' => $request->tahun_perolehan,
                 'kondisi' => $request->kondisi,
                 'nilai_perolehan' => $request->nilai_perolehan,
                 'nilai_pertahun' => $request->nilai_pertahun,

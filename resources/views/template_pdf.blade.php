@@ -30,16 +30,11 @@
                 <th>Nama Barang</th>
                 <th>Kode Barang</th>
                 <th>kode Barang Resmi</th>
-                <th>Tahun Perolehan</th>
+                <th>Tahun Pembelian</th>
                 <th>Kondisi</th>
                 <th>Nilai Perolehan</th>
-                {{-- <th>Nilai Pertahun</th> --}}
-                {{-- <th>Tahun Pembelian</th> --}}
-                {{-- <th>Masa Manfaat</th> --}}
-                {{-- <th>Keterangan</th> --}}
                 <th>Kategori Barang</th>
                 <th>Lokasi</th>
-                {{-- <th>Metode Penyusutan</th> --}}
             </tr>
         </thead>
         <tbody>
@@ -48,16 +43,11 @@
                 <td style="width:200px">{{ $item["nama_barang"] ?? "-"  }}</td>
                 <td style="width:100px">{{ $item["kode_barang"] ?? "-"  }}</td>
                 <td style="width:100px">{{ $item["kode_barang_resmi"] ?? "-" }}</td>
-                <td style="width:100px">{{ $item["tahun_perolehan"] ?? "-"  }}</td>
+                <td style="width:100px">{{ $item["tahun_pembelian"] ?? "-"  }}</td>
                 <td style="width:50px">{{ $item["kondisi"] ?? "-"  }}</td>
                 <td style="width:90px">{{ $item["nilai_perolehan"] ?? "-"  }}</td>
-                {{-- <td>{{ $item["nilai_pertahun"] ?? "-"  }}</td> --}}
-                {{-- <td>{{ $item["tahun_pembelian"] ?? "-"  }}</td> --}}
-                {{-- <td>{{ $item["masa_manfaat"] ?? "-"  }}</td> --}}
-                {{-- <td>{{ $item["keterangan"] ?? "-" }}</td> --}}
                 <td style="width:100px">{{ $item["kategori"]["nama_kategori"] ?? "-"  }}</td>
                 <td style="width:150px">{{ $item["lokasi"]["nama_lokasi"] ?? "-"  }}</td>
-                {{-- <td>{{ $item["metode_penyusutan"]["nama_penyusutan"] ?? "-"  }}</td> --}}
             </tr>
             @endforeach
         </tbody>
