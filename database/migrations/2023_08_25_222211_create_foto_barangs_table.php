@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid');
             $table->string('foto_barang');
+            $table->string('lokasi_foto');
             $table->foreignId('barang_id');
             $table->timestamps();
             $table->softDeletes();

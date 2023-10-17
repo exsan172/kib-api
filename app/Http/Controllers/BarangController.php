@@ -311,6 +311,7 @@ class BarangController extends Controller
                     $images[] = [
                         'uuid' => Uuid::uuid4(),
                         'barang_id' => $barang->id,
+                        'lokasi_foto' => $file,
                         'foto_barang' => asset('storage/' . $file),
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
@@ -381,13 +382,13 @@ class BarangController extends Controller
 
 
             if (isset($request->images) && is_array($request->images)) {
-                $barang->fotoBarang()->delete();
                 $images  = [];
                 foreach ($request->images as $image) {
                     $file = Storage::disk('public')->put('barang', $image);
                     $images[] = [
                         'uuid' => Uuid::uuid4(),
                         'barang_id' => $barang->id,
+                        'lokasi_foto' => $file,
                         'foto_barang' => asset('storage/' . $file),
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
@@ -415,6 +416,49 @@ class BarangController extends Controller
                 'data' => '',
                 'error' => $th->getMessage(),
                 'request' => $request->all()
+            ], 400);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteFotoBarang(Request $request, $id)
+    {
+        try {
+            $imagesID     = $id;
+            $findIDBarang = FotoBarang::where("id", $imagesID)->first();
+            $pathFile     = $findIDBarang->lokasi_foto;
+
+            if($findIDBarang === null) {
+                return response()->json([
+                    'message' => 'ID foto tidak di temukan !'
+                ], 400);
+            }
+
+            if (Storage::disk('public')->exists($pathFile)) {
+                $findIDBarang->delete();
+                Storage::disk('public')->delete($pathFile);
+    
+                return response()->json([
+                    'message' => 'Hapus Foto Barang Success'
+                ], 200);
+                
+            } else {
+                return response()->json([
+                    'message' => 'File tidak di temukan di penyimpanan !'
+                ], 400);
+            }
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Hapus Foto Barang Error',
+                'error' => $th->getMessage(),
             ], 400);
         }
     }
@@ -467,21 +511,5 @@ class BarangController extends Controller
                 'message' => 'Delete Barang Error',
             ], 400);
         }
-    }
-
-    function deleteFoto($foto_id)
-    {
-        $foto = FotoBarang::whereUuid($foto_id);
-
-        if ($foto) {
-            $foto->delete();
-            return response()->json([
-                'message' => 'Delete Photo Success',
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Delete Photo Error',
-        ], 400);
     }
 }

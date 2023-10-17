@@ -13,6 +13,7 @@ class FotoBarang extends Model
     protected $fillable = [
         'uuid',
         'foto_barang',
+        'lokasi_foto',
         'barang_id',
     ];
 

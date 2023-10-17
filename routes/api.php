@@ -80,7 +80,7 @@ Route::prefix('v1')->group(function () {
         Route::post('barang/import', [BarangController::class, 'importDataBarang']);
         Route::post('barang/print', [BarangController::class, 'printDataBarang']);
         Route::get('barang/export', [BarangController::class, 'exportDataBarang']);
-        Route::delete('barang/delete-foto/{foto_id}', [BarangController::class, 'deleteFoto']);
+        Route::delete('barang/delete-foto/{id}', [BarangController::class, 'deleteFotoBarang']);
         Route::get('barang/barcode', [BarangController::class, 'barcode']);
         Route::get('barang/barcode/{barcode}', [BarangController::class, 'barangByBarcode']);
         Route::get('barang/history-update/{id}', [BarangController::class, 'historyUpdateBarang']);
