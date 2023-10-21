@@ -5,6 +5,8 @@ namespace App\Http\Controllers\V1\Pemindahan;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PemindahanBarangResource;
 use App\Models\PemindahanBarang;
+use App\Models\Barang;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
@@ -54,6 +56,14 @@ class TukarBarangController extends Controller
      */
     public function store(Request $request)
     {
+        // check barang
+        $cekBarang = Barang::find($request->barang_id);
+        if($cekBarang == null) {
+            return response()->json([
+                'message' => 'Barang tidak ditemukan',
+            ], 400);
+        }
+
         // store role
         $barangJual = PemindahanBarang::create([
             'uuid' => Uuid::uuid4(),
@@ -63,6 +73,9 @@ class TukarBarangController extends Controller
             'barang_yang_ditukar' => $request->barang_yang_ditukar,
             'tanggal_tukar' => $request->tanggal_tukar,
         ]);
+
+        $dataBarang = Barang::find($request->barang_id);
+        $updateStatusBarang = $dataBarang->status = 0;
 
         return response()->json([
             'message' => 'Create Tukar Barang Success',

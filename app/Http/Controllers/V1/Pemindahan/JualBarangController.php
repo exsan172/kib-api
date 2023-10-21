@@ -5,6 +5,8 @@ namespace App\Http\Controllers\V1\Pemindahan;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PemindahanBarangResource;
 use App\Models\PemindahanBarang;
+use App\Models\Barang;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
@@ -54,6 +56,14 @@ class JualBarangController extends Controller
      */
     public function store(Request $request)
     {
+        // check barang
+        $cekBarang = Barang::find($request->barang_id);
+        if($cekBarang == null) {
+            return response()->json([
+                'message' => 'Barang tidak ditemukan',
+            ], 400);
+        }
+
         // store role
         $barangJual = PemindahanBarang::create([
             'uuid' => Uuid::uuid4(),
@@ -63,6 +73,8 @@ class JualBarangController extends Controller
             'harga_jual' => $request->harga_jual,
             'tanggal_jual' => $request->tanggal_jual,
         ]);
+
+        $updateStatusBarang = $cekBarang->status = 0;
 
         return response()->json([
             'message' => 'Create Jual Barang Success',

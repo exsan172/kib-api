@@ -290,6 +290,7 @@ class BarangController extends Controller
                 'uuid' => Uuid::uuid4(),
                 'nama_barang' => $request->nama_barang,
                 'kode_barang' => $request->kode_barang,
+                'kode_barang_resmi' => $request->kode_barang_resmi,
                 'kondisi' => $request->kondisi,
                 'nilai_perolehan' => $request->nilai_perolehan,
                 'nilai_pertahun' => $request->nilai_pertahun,

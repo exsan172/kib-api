@@ -5,6 +5,8 @@ namespace App\Http\Controllers\V1\Pemindahan;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PemindahanBarangResource;
 use App\Models\PemindahanBarang;
+use App\Models\Barang;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
@@ -52,6 +54,14 @@ class HibahBarangController extends Controller
      */
     public function store(Request $request)
     {
+        // check barang
+        $cekBarang = Barang::find($request->barang_id);
+        if($cekBarang == null) {
+            return response()->json([
+                'message' => 'Barang tidak ditemukan',
+            ], 400);
+        }
+
         // store role
         $barangHibah = PemindahanBarang::create([
             'uuid' => Uuid::uuid4(),
@@ -61,6 +71,8 @@ class HibahBarangController extends Controller
             'tanggal_diterima' => $request->tanggal_diterima
         ]);
 
+        $updateStatusBarang = $cekBarang->status = 0;
+        
         return response()->json([
             'message' => 'Create Hibah Barang Success',
             'data' => new PemindahanBarangResource($barangHibah),
