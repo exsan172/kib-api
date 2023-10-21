@@ -118,7 +118,7 @@ class LokasiController extends Controller
     {
         try {
             DB::beginTransaction();
-            $lokasi = Lokasi::where('id', $id)->first();
+            $lokasi = Lokasi::where('uuid', $id)->first();
             if($lokasi == null) {
                 return response()->json([
                     'message' => 'Lokasi tidak di temukan',
