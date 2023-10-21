@@ -29,6 +29,9 @@ class Barang extends Model
         'metode_penyusutan_id',
         'user_created'
     ];
+    protected $attributes = [
+        'status' => 1
+    ];
     protected $appends = ['nama_kategori', 'nama_penyusutan', 'user_created_name'];
     protected $with = ['fotoBarang', 'riwayatPengecekan', 'lokasi'];
 

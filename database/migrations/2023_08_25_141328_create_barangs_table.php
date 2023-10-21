@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('tahun_pembelian')->nullable();
             $table->string('masa_manfaat')->nullable();
             $table->text('keterangan')->nullable();
-            $table->char('status', 1)->default(1)->nullable();
+            $table->char('status', 1)->default(1);
             $table->boolean('penyusutan_barang')->nullable();
             $table->foreignId('kategori_barang_id');
             $table->foreignId('lokasi_id');
