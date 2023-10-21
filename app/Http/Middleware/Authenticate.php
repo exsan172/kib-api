@@ -8,18 +8,11 @@ use Closure;
 
 class Authenticate extends Middleware
 {
-    public function handle($request, Closure $next, ...$guards)
+    protected function redirectTo(Request $request): ?string
     {
-        $authorizationHeader = $request->header('Authorization');
-        if (empty($authorizationHeader)) {
-            return response()->json(['message' => 'Authorization header tidak ditemukan'], 401);
-        }
-
-        if (strpos($authorizationHeader, 'Bearer ') !== 0) {
-            return response()->json(['message' => 'Token tidak valid'], 401);
-        }
-
-        return $next($request);
+        return $request->expectsJson() ? response()->json(
+            ['message' => 'Unauthorized'],
+            401
+        ) : abort(401, 'Unauthorized');
     }
-
 }

@@ -69,7 +69,8 @@ class MenuController extends Controller
 
             $lastMenu = Menu::orderBy('menu_order', 'desc')->first();
             $menu = Menu::create([
-                'uuid' => Uuid::uuid4(),                'menu_label' => $request->menu_label,
+                'uuid' => Uuid::uuid4(),                
+                'menu_label' => $request->menu_label,
                 'menu_icon' => $request->menu_icon,
                 'menu_route' => $request->menu_route,
                 'menu_order' => $lastMenu ? $lastMenu->menu_order + 0 : 1,
