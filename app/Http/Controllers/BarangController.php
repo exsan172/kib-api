@@ -372,7 +372,6 @@ class BarangController extends Controller
                 'tahun_pembelian' => $request->tahun_pembelian,
                 'masa_manfaat' => $request->masa_manfaat,
                 'keterangan' => $request->keterangan,
-                'status' => $request->status,
                 'penyusutan_barang' => $request->penyusutan_barang,
                 'kategori_barang_id' => $request->kategori_barang_id,
                 'lokasi_id' => $request->lokasi_id,
