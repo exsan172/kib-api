@@ -118,7 +118,12 @@ class LokasiController extends Controller
     {
         try {
             DB::beginTransaction();
-            $lokasi = Lokasi::whereUuid($id)->first();
+            $lokasi = Lokasi::where('id', $id)->first();
+            if($lokasi == null) {
+                return response()->json([
+                    'message' => 'Lokasi tidak di temukan',
+                ], 400);
+            }
 
             $barang = Barang::where('lokasi_id', $lokasi->id)->first();
             if ($barang) {
@@ -128,14 +133,17 @@ class LokasiController extends Controller
             } else {
                 $lokasi->delete();
             }
+
             DB::commit();
             return response()->json([
                 'message' => 'Delete lokasi Success',
-            ]);
+            ], 200);
+
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json([
                 'message' => 'Delete lokasi Error',
+                'error' => $th->getMessage()
             ], 400);
         }
     }

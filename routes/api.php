@@ -75,6 +75,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::resource('lokasi', LokasiController::class);
         Route::post('lokasi/list', [LokasiController::class, 'list']);
+        Route::delete('lokasi/{id}', [LokasiController::class, 'destroy']);
 
         Route::post('barang/list', [BarangController::class, 'list']);
         Route::post('barang/import', [BarangController::class, 'importDataBarang']);

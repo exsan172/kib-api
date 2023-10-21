@@ -4,17 +4,22 @@ namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
+use Closure;
 
 class Authenticate extends Middleware
 {
-    /**
-     * Get the path the user should be redirected to when they are not authenticated.
-     */
-    protected function redirectTo(Request $request): ?string
+    public function handle($request, Closure $next, ...$guards)
     {
-        return $request->expectsJson() ? response()->json(
-            ['message' => 'Unauthorized'],
-            401
-        ) : route('login');
+        $authorizationHeader = $request->header('Authorization');
+        if (empty($authorizationHeader)) {
+            return response()->json(['message' => 'Authorization header tidak ditemukan'], 401);
+        }
+
+        if (strpos($authorizationHeader, 'Bearer ') !== 0) {
+            return response()->json(['message' => 'Token tidak valid'], 401);
+        }
+
+        return $next($request);
     }
+
 }
