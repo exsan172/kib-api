@@ -92,7 +92,7 @@ class UserProfileController extends Controller
                 // Simpan file ke storage
                 $path = $file->storeAs('profile', $filename);
 
-                $dataUser['foto'] = asset('storage/' . $path);
+                $dataUser['profile_image'] = asset('storage/' . $path);
             }
 
 
