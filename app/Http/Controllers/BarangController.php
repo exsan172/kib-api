@@ -33,7 +33,7 @@ class BarangController extends Controller
     {
         try {
             if ($request->hasFile('document_barang')) {
-                
+
                 $file      = $request->file('document_barang');
                 $extension = $file->getClientOriginalExtension();
 
@@ -324,7 +324,7 @@ class BarangController extends Controller
 
             return response()->json([
                 'message' => 'Create Barang Success',
-                'data' => new BarangResource($barang),
+                'data' => new BarangResource(Barang::find($barang->id)),
             ]);
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -442,11 +442,11 @@ class BarangController extends Controller
             if (Storage::disk('public')->exists($pathFile)) {
                 $findIDBarang->delete();
                 Storage::disk('public')->delete($pathFile);
-    
+
                 return response()->json([
                     'message' => 'Hapus Foto Barang Success'
                 ], 200);
-                
+
             } else {
                 return response()->json([
                     'message' => 'File tidak di temukan di penyimpanan !'
