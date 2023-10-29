@@ -69,7 +69,7 @@ class UserProfileController extends Controller
                 $file = $request->file('profile_image');
 
                 // Rubah original filename ketika diupload by Nawan
-                $filename = md5($file->getClientOriginalName() . '' . $user->id . '' . date('YmdHis') . '_' . rand()) . '.' . $file->extension();
+                //$filename = md5($file->getClientOriginalName() . '' . $user->id . '' . date('YmdHis') . '_' . rand()) . '.' . $file->extension();
 
                 // Hapus file jika sudah ada sebelumnya
                 // $disk = Storage::disk('public');
@@ -91,7 +91,7 @@ class UserProfileController extends Controller
                 }
 
                 // Simpan file ke storage
-                $path = $file->storeAs('profile', $filename);
+                $path = Storage::disk('public')->put('barang', $file);
 
                 $dataUser['profile_image'] = asset('storage/' . $path);
             }
