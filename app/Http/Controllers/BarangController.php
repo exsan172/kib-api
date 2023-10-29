@@ -406,7 +406,7 @@ class BarangController extends Controller
 
             return response()->json([
                 'message' => 'Update Barang Success',
-                'data' => new BarangResource($newBarang),
+                'data' => new BarangResource(Barang::find($barang->id)),
             ]);
         } catch (\Throwable $th) {
             DB::rollBack();
