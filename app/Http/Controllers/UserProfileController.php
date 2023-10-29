@@ -62,6 +62,7 @@ class UserProfileController extends Controller
                 'email' => $request->email,
                 'telepon' => $request->telepon,
                 'status' => $request->status ?? 1,
+                'gender' => $request->gender,
             ];
 
             if ($request->hasFile('profile_image')) {
