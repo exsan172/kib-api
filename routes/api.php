@@ -71,6 +71,8 @@ Route::prefix('v1')->group(function () {
         Route::post('metode-penyusutan/barang/list', [MetodePenyusutanController::class, 'list']);
     });
 
+    Route::get('barang/barcode/{barcode}', [BarangController::class, 'barangByBarcode']);
+
     // master
     Route::middleware('auth:sanctum')->group(function () {
         Route::resource('lokasi', LokasiController::class);
@@ -83,7 +85,6 @@ Route::prefix('v1')->group(function () {
         Route::get('barang/export', [BarangController::class, 'exportDataBarang']);
         Route::delete('barang/delete-foto/{id}', [BarangController::class, 'deleteFotoBarang']);
         Route::get('barang/barcode', [BarangController::class, 'barcode']);
-        Route::get('barang/barcode/{barcode}', [BarangController::class, 'barangByBarcode']);
         Route::get('barang/history-update/{id}', [BarangController::class, 'historyUpdateBarang']);
         Route::resource('barang', BarangController::class);
 
