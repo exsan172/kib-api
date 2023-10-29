@@ -31,7 +31,6 @@ class UserProfileController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100',
-            'telepon' => 'required|string',
         ]);
 
         // response validation error
