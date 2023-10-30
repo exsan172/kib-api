@@ -283,6 +283,9 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'kode_barang' => 'required|unique:barang',
+        ]);
         // store role
         try {
             DB::beginTransaction();
@@ -360,9 +363,17 @@ class BarangController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $barang = Barang::whereUuid($id)->first();
+        if(!$barang){
+            return response()->json([
+                'message' => 'Barang tidak ditemukan',
+            ], 404);
+        }
+        $request->validate([
+            'kode_barang' => "required|unique:barang,kode_barang,$barang->id",
+        ]);
         try {
             DB::beginTransaction();
-            $barang = Barang::whereUuid($id)->first();
             $newBarang = $barang;
             $barang->update([
                 'nama_barang' => $request->nama_barang,
