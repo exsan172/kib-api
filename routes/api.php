@@ -71,15 +71,16 @@ Route::prefix('v1')->group(function () {
         Route::post('metode-penyusutan/barang/list', [MetodePenyusutanController::class, 'list']);
     });
 
+    //api get barang by barcode without auth
     Route::get('barang/barcode/{barcode}', [BarangController::class, 'barangByBarcode']);
-
+    //api list barang using auth:sanctum or auth:api
+    Route::middleware('auth:sanctum,api')->post('barang/list', [BarangController::class, 'list']);
     // master
     Route::middleware('auth:sanctum')->group(function () {
         Route::resource('lokasi', LokasiController::class);
         Route::post('lokasi/list', [LokasiController::class, 'list']);
         Route::delete('lokasi/{id}', [LokasiController::class, 'destroy']);
 
-        Route::post('barang/list', [BarangController::class, 'list']);
         Route::post('barang/import', [BarangController::class, 'importDataBarang']);
         Route::post('barang/print', [BarangController::class, 'printDataBarang']);
         Route::get('barang/export', [BarangController::class, 'exportDataBarang']);
