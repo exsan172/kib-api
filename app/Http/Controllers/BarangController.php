@@ -11,6 +11,8 @@ use App\Models\Lokasi;
 use App\Models\FotoBarang;
 use App\Models\LogHistoryBarang;
 use App\Exports\DataBarang;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 use PDF;
 use Carbon\Carbon;
@@ -283,12 +285,21 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'kode_barang' => 'required|unique:barang',
-        ]);
+        
         // store role
         try {
             DB::beginTransaction();
+            
+            $existingLocation = Barang::where('kode_barang', $request->kode_barang)->first();
+            if ($existingLocation) {
+                throw ValidationException::withMessages(['kode_barang' => ['Kode barang sudah digunakan']]);
+            }
+
+            $existingLocation = Barang::where('kode_barang_resmi', $request->kode_barang_resmi)->first();
+            if ($existingLocation) {
+                throw ValidationException::withMessages(['kode_barang_resmi' => ['Kode barang resmi sudah digunakan']]);
+            }
+
             $barang = Barang::create([
                 'uuid' => Uuid::uuid4(),
                 'nama_barang' => $request->nama_barang,
@@ -369,15 +380,30 @@ class BarangController extends Controller
                 'message' => 'Barang tidak ditemukan',
             ], 404);
         }
+        
         $request->validate([
-            'kode_barang' => "required|unique:barang,kode_barang,$barang->id",
+            'kode_barang' => [
+                'required',
+                'string',
+                Rule::unique('barang', 'kode_barang')->ignore($barang->id),
+            ]
         ]);
+
+        $request->validate([
+            'kode_barang_resmi' => [
+                'required',
+                'string',
+                Rule::unique('barang', 'kode_barang_resmi')->ignore($barang->id),
+            ]
+        ]);
+
         try {
             DB::beginTransaction();
             $newBarang = $barang;
             $barang->update([
                 'nama_barang' => $request->nama_barang,
                 'kode_barang' => $request->kode_barang,
+                'kode_barang_resmi' => $request->kode_barang_resmi,
                 'kondisi' => $request->kondisi,
                 'nilai_perolehan' => $request->nilai_perolehan,
                 'nilai_pertahun' => $request->nilai_pertahun,

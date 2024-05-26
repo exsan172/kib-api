@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('lokasi', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('uuid');
+            $table->string('kode_lokasi');
             $table->string('nama_lokasi');
             $table->foreignId('parent_id')->nullable();
             $table->timestamps();

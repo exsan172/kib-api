@@ -8,6 +8,8 @@ use App\Models\Lokasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class LokasiController extends Controller
 {
@@ -49,11 +51,17 @@ class LokasiController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            $existingLocation = Lokasi::where('kode_lokasi', $request->kode_lokasi)->first();
+            if ($existingLocation) {
+                throw ValidationException::withMessages(['kode_lokasi' => ['Kode lokasi sudah digunakan']]);
+            }
+
             $lokasi = Lokasi::create([
                 'uuid' => Uuid::uuid4(),
                 'nama_lokasi' => $request->nama_lokasi,
+                'kode_lokasi' => $request->kode_lokasi,
                 'parent_id' => $request->parent_id,
-
             ]);
 
             DB::commit();
@@ -65,7 +73,7 @@ class LokasiController extends Controller
             DB::rollBack();
             return response()->json([
                 'message' => 'Create lokasi Error',
-                'data' => '',
+                'data' => $th,
             ], 400);
         }
     }
@@ -90,9 +98,19 @@ class LokasiController extends Controller
         try {
             DB::beginTransaction();
             $lokasi = Lokasi::whereUuid($id)->first();
+
+            $request->validate([
+                'kode_lokasi' => [
+                    'required',
+                    'string',
+                    Rule::unique('lokasi', 'kode_lokasi')->ignore($lokasi->id),
+                ]
+            ]);
+
             $lokasi->update([
                 'uuid' => Uuid::uuid4(),
                 'nama_lokasi' => $request->nama_lokasi,
+                'kode_lokasi' => $request->kode_lokasi,
                 'parent_id' => $request->parent_id,
 
             ]);

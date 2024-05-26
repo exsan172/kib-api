@@ -12,16 +12,18 @@ class DashboardController extends Controller
     public function dashboardData(Request $request)
     {
         try {
-            $dataTotalBarang  = Barang::count();
-            $totalBarangRusak = Barang::where('kondisi', 'rusak')->count();
-            $totalPenguna     = User::count();
-            $totalKategori    = KategoriBarang::count();
+            $dataTotalBarang        = Barang::count();
+            $totalBarangRusakRingan = Barang::where('kondisi', 'rusak ringan')->count();
+            $totalBarangRusakBerat  = Barang::where('kondisi', 'rusak berat')->count();
+            $totalPenguna           = User::count();
+            $totalKategori          = KategoriBarang::count();
             
             $dataResponse     = [
-                'total_barang_rusak' =>  $totalBarangRusak,
-                'total_barang'       =>  $dataTotalBarang,
-                'total_penguna'      =>  $totalPenguna,
-                'total_kategori'     =>  $totalKategori,
+                'total_barang_rusak_berat'  =>  $totalBarangRusakBerat,
+                'total_barang_rusak_ringan' =>  $totalBarangRusakRingan,
+                'total_barang'              =>  $dataTotalBarang,
+                'total_penguna'             =>  $totalPenguna,
+                'total_kategori'            =>  $totalKategori,
             ];
 
             return response()->json([
