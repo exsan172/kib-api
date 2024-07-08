@@ -26,6 +26,7 @@ return new class extends Migration
             $table->boolean('penyusutan_barang')->nullable();
             $table->foreignId('kategori_barang_id');
             $table->foreignId('lokasi_id');
+            $table->foreignId('karyawan')->nullable();
             $table->foreignId('metode_penyusutan_id');
             $table->timestamps();
             $table->softDeletes();

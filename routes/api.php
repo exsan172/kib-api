@@ -18,6 +18,7 @@ use App\Http\Controllers\V1\Sites\RoleController;
 use App\Http\Controllers\V1\User\MenuUserController;
 use App\Http\Controllers\V1\User\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmployeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -120,6 +121,11 @@ Route::prefix('v1')->group(function () {
         Route::resource('contact', UserController::class);
         Route::post('contact/list', [UserController::class, 'list']);
     });
+
+    Route::get('karyawan', [EmployeController::class, 'list'])->middleware('auth:sanctum');
+    Route::post('karyawan', [EmployeController::class, 'store'])->middleware('auth:sanctum');
+    Route::delete('karyawan/{id}', [EmployeController::class, 'destroy'])->middleware('auth:sanctum');
+    Route::put('karyawan/{id}', [EmployeController::class, 'update'])->middleware('auth:sanctum');
 
     Route::get('dashboard', [UserProfileController::class, 'dashboard'])->middleware('auth:sanctum');
     Route::get('dashboard/data', [DashboardController::class, 'dashboardData'])->middleware('auth:sanctum');
