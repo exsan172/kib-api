@@ -315,6 +315,7 @@ class BarangController extends Controller
                 'kategori_barang_id' => $request->kategori_barang_id,
                 'lokasi_id' => $request->lokasi_id,
                 'metode_penyusutan_id' => $request->metode_penyusutan_id ?? 0,
+                'karyawan' => $request->karyawan,
                 'user_created' => auth()->user()->id,
             ]);
 
@@ -414,6 +415,7 @@ class BarangController extends Controller
                 'kategori_barang_id' => $request->kategori_barang_id,
                 'lokasi_id' => $request->lokasi_id,
                 'metode_penyusutan_id' => $request->metode_penyusutan_id,
+                'karyawan' => $request->karyawan
             ]);
 
 

@@ -27,6 +27,7 @@ class Barang extends Model
         'kategori_barang_id',
         'lokasi_id',
         'metode_penyusutan_id',
+        'karyawan',
         'user_created'
     ];
     protected $attributes = [
@@ -133,5 +134,10 @@ class Barang extends Model
     public function getUserCreatedNameAttribute()
     {
         return $this->userCreated?->name ?? '-';
+    }
+
+    public function karyawan()
+    {
+        return $this->belongsTo(Employe::class);
     }
 }

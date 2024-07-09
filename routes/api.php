@@ -124,6 +124,7 @@ Route::prefix('v1')->group(function () {
 
     Route::get('karyawan', [EmployeController::class, 'list'])->middleware('auth:sanctum');
     Route::post('karyawan', [EmployeController::class, 'store'])->middleware('auth:sanctum');
+    Route::get('karyawan/{id}', [EmployeController::class, 'show'])->middleware('auth:sanctum');
     Route::delete('karyawan/{id}', [EmployeController::class, 'destroy'])->middleware('auth:sanctum');
     Route::put('karyawan/{id}', [EmployeController::class, 'update'])->middleware('auth:sanctum');
 

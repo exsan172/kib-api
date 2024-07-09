@@ -40,17 +40,6 @@ class EmployeController extends Controller
             'message' => 'List employe'
         ]);
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $employe = Employe::all();
-        return response()->json([
-            'message' => 'Employe Data',
-            'data' => $employe,
-        ]);
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -87,9 +76,9 @@ class EmployeController extends Controller
      */
     public function show(string $id)
     {
-        $employe = Employe::whereUuid($id)->first();
+        $employe = Employe::where('id', $id)->first();
         return response()->json([
-            'message' => 'Lokasi Data',
+            'message' => 'Employe Data',
             'data' => new EmployeResource($employe),
         ]);
     }
@@ -101,7 +90,7 @@ class EmployeController extends Controller
     {
         try {
             DB::beginTransaction();
-            $employe = Employe::whereUuid($id)->first();
+            $employe = Employe::where('id', $id)->first();
 
             $employe->update([
                 'nama' => $request->nama,
@@ -112,14 +101,14 @@ class EmployeController extends Controller
 
             DB::commit();
             return response()->json([
-                'message' => 'Create employe Success',
-                'data' => new EmployeResource($employe),
+                'message' => 'Update employe Success',
+                'data' => new EmployeResource($employe)
             ]);
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Create employe Error',
-                'data' => '',
+                'message' => 'Update employe Error',
+                'data' => $th,
             ], 400);
         }
     }
