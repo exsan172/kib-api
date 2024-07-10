@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\EmployeResource;
 use App\Models\Employe;
 use Illuminate\Http\Request;
@@ -27,10 +28,16 @@ class EmployeController extends Controller
         if ($search) {
             $employeQuery->where(function ($query) use ($search) {
                 $query->where('nama', 'like', "%$search%");
+                $query->orWhere('nip', 'like', "%$search%");
+                $query->orWhere('instansi', 'like', "%$search%");
+                $query->orWhere('jabatan', 'like', "%$search%");
             });
         }
 
-        // // Paginate results
+        // Urutkan berdasarkan created_at descending (terbaru terlebih dahulu)
+        $employeQuery->orderBy('created_at', 'desc');
+
+        // Paginate results
         $employes = $employeQuery->paginate($perPage);
 
         // Return response
@@ -48,25 +55,33 @@ class EmployeController extends Controller
     {
         try {
             DB::beginTransaction();
-
-            $employe = Employe::create([
-                'foto' => $request->foto,
-                'nama' => $request->nama,
-                'nip' => $request->nip,
-                'instansi' => $request->instansi,
-                'jabatan' => $request->jabatan
+            $request->validate([
+                'foto'     => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'nama'     => 'required|string|max:255',
+                'nip'      => 'required|string|max:255',
+                'instansi' => 'required|string|max:255',
+                'jabatan'  => 'required|string|max:255',
+            ]);
+            $fotoPath = $request->file('foto')->store('photos', 'public');
+            $employe  = Employe::create([
+                'foto'      => $fotoPath,
+                'nama'      => $request->nama,
+                'nip'       => $request->nip,
+                'instansi'  => $request->instansi,
+                'jabatan'   => $request->jabatan
             ]);
 
             DB::commit();
             return response()->json([
-                'message' => 'Create employe Success',
-                'data' => new EmployeResource($employe),
+                'message'   => 'Create employe Success',
+                'data'      => new EmployeResource($employe),
             ]);
+
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Create employe Error',
-                'data' => $th,
+                'message'   => 'Create employe Error',
+                'data'      => $th,
             ], 400);
         }
     }
@@ -78,8 +93,8 @@ class EmployeController extends Controller
     {
         $employe = Employe::where('id', $id)->first();
         return response()->json([
-            'message' => 'Employe Data',
-            'data' => new EmployeResource($employe),
+            'message'   => 'Employe Data',
+            'data'      => new EmployeResource($employe),
         ]);
     }
 
@@ -90,25 +105,45 @@ class EmployeController extends Controller
     {
         try {
             DB::beginTransaction();
-            $employe = Employe::where('id', $id)->first();
+            $employe = Employe::findOrFail($id);
 
-            $employe->update([
-                'nama' => $request->nama,
-                'nip' => $request->nip,
-                'instansi' => $request->instansi,
-                'jabatan' => $request->jabatan
+            // Validasi data
+            $request->validate([
+                'nama'      => 'required|string|max:255',
+                'nip'       => 'required|string|max:255',
+                'instansi'  => 'required|string|max:255',
+                'jabatan'   => 'required|string|max:255',
+                'foto'      => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
+            
+            // Update foto jika ada
+            if ($request->hasFile('foto')) {
+                if ($employe->foto && Storage::disk('public')->exists($employe->foto)) {
+                    Storage::disk('public')->delete($employe->foto);
+                }
+
+                $fotoPath       = $request->file('foto')->store('photos', 'public');
+                $employe->foto  = $fotoPath;
+            }
+
+            // Update data employe
+            $employe->nama      = $request->nama;
+            $employe->nip       = $request->nip;
+            $employe->instansi  = $request->instansi;
+            $employe->jabatan   = $request->jabatan;
+            $employe->save();
 
             DB::commit();
             return response()->json([
-                'message' => 'Update employe Success',
-                'data' => new EmployeResource($employe)
+                'message'   => 'Update employe Success',
+                'data'      => new EmployeResource($employe)
             ]);
+
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Update employe Error',
-                'data' => $th,
+                'message'   => 'Update employe Error',
+                'data'      => $th,
             ], 400);
         }
     }
@@ -120,15 +155,22 @@ class EmployeController extends Controller
     {
         try {
             DB::beginTransaction();
-    
-            $employe = Employe::where('id', $id)->first();
+        
+            // Cari employe berdasarkan ID
+            $employe = Employe::find($id);
             
             if ($employe == null) {
                 return response()->json([
                     'message' => 'Karyawan tidak ditemukan',
                 ], 400);
             }
+
+            // Hapus foto dari storage
+            if ($employe->foto && Storage::disk('public')->exists($employe->foto)) {
+                Storage::disk('public')->delete($employe->foto);
+            }
             
+            // Hapus employe dari database
             $employe->delete();
             
             DB::commit();
