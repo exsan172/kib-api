@@ -503,7 +503,6 @@ class BarangController extends Controller
             ], 400);
         }
     }
-
     /**
      * Update the specified resource in storage.
      *
