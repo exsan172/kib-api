@@ -64,7 +64,7 @@ class EmployeController extends Controller
             ]);
             $fotoPath = $request->file('foto')->store('photos', 'public');
             $employe  = Employe::create([
-                'foto'      => $fotoPath,
+                'foto'      => asset('storage/' . $fotoPath),
                 'nama'      => $request->nama,
                 'nip'       => $request->nip,
                 'instansi'  => $request->instansi,
@@ -123,7 +123,7 @@ class EmployeController extends Controller
                 }
 
                 $fotoPath       = $request->file('foto')->store('photos', 'public');
-                $employe->foto  = $fotoPath;
+                $employe->foto  = asset('storage/' . $fotoPath);
             }
 
             // Update data employe
