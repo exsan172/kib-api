@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('kode_barang_resmi', 20)->nullable();
             $table->string('kondisi')->default('baik');
             $table->string('nilai_perolehan')->nullable();
+            $table->string('nilai_pertahun')->nullable();
             $table->string('tahun_pembelian')->nullable();
             $table->string('masa_manfaat')->nullable();
             $table->text('keterangan')->nullable();
@@ -26,8 +27,9 @@ return new class extends Migration
             $table->boolean('penyusutan_barang')->nullable();
             $table->foreignId('kategori_barang_id');
             $table->foreignId('lokasi_id');
-            $table->foreignId('karyawan')->nullable();
+            $table->foreignId('karyawan_id')->nullable();
             $table->foreignId('metode_penyusutan_id');
+            $table->char('user_created', 36);
             $table->timestamps();
             $table->softDeletes();
         });

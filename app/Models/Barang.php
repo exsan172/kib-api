@@ -27,7 +27,7 @@ class Barang extends Model
         'kategori_barang_id',
         'lokasi_id',
         'metode_penyusutan_id',
-        'karyawan',
+        'karyawan_id',
         'user_created'
     ];
     protected $attributes = [
@@ -138,6 +138,6 @@ class Barang extends Model
 
     public function karyawan()
     {
-        return $this->belongsTo(Employe::class);
+        return $this->belongsTo(Employe::class, "karyawan_id");
     }
 }
