@@ -90,7 +90,7 @@ Route::prefix('v1')->group(function () {
         Route::get('barang/history-update/{id}', [BarangController::class, 'historyUpdateBarang']);
         // Route::resource('barang', BarangController::class);
 
-        Route::delete('barang', [BarangController::class, 'destroy']);
+        Route::delete('barang/{id}', [BarangController::class, 'destroy']);
         Route::get('barang', [BarangController::class, 'list']);
         Route::get('barang/{id}', [BarangController::class, 'show']);
         Route::post('barang', [BarangController::class, 'store']);
