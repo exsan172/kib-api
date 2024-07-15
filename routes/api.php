@@ -19,6 +19,7 @@ use App\Http\Controllers\V1\User\MenuUserController;
 use App\Http\Controllers\V1\User\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeController;
+use App\Http\Controllers\CheckHistoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -88,13 +89,15 @@ Route::prefix('v1')->group(function () {
         Route::delete('barang/delete-foto/{id}', [BarangController::class, 'deleteFotoBarang']);
         Route::get('barang/barcode', [BarangController::class, 'barcode']);
         Route::get('barang/history-update/{id}', [BarangController::class, 'historyUpdateBarang']);
-        // Route::resource('barang', BarangController::class);
 
         Route::delete('barang/{id}', [BarangController::class, 'destroy']);
         Route::get('barang', [BarangController::class, 'list']);
         Route::get('barang/{id}', [BarangController::class, 'show']);
         Route::post('barang', [BarangController::class, 'store']);
         Route::post('barang/{id}', [BarangController::class, 'update']);
+
+        Route::post('history/{id}', [BarangController::class, 'updateCheck']);
+        Route::get('history', [BarangController::class, 'listHistory']);
 
         Route::resource('jadwal', JadwalPengecekanController::class);
         Route::post('jadwal/list', [JadwalPengecekanController::class, 'list']);
@@ -133,6 +136,9 @@ Route::prefix('v1')->group(function () {
     Route::get('karyawan/{id}', [EmployeController::class, 'show'])->middleware('auth:sanctum');
     Route::delete('karyawan/{id}', [EmployeController::class, 'destroy'])->middleware('auth:sanctum');
     Route::post('karyawan/{id}', [EmployeController::class, 'update'])->middleware('auth:sanctum');
+
+    Route::get('history', [CheckHistoryController::class, 'index'])->middleware('auth:sanctum');
+    Route::get('detail-history', [CheckHistoryController::class, 'list'])->middleware('auth:sanctum');
 
     Route::get('dashboard', [UserProfileController::class, 'dashboard'])->middleware('auth:sanctum');
     Route::get('dashboard/data', [DashboardController::class, 'dashboardData'])->middleware('auth:sanctum');

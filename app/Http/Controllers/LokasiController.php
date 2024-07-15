@@ -17,14 +17,14 @@ class LokasiController extends Controller
     {
         // list all
         $search = $request->search;
-
         $lokasi =  Lokasi::query()->with('children');
         if ($search) {
             $lokasi->where(function ($query) use ($search) {
                 $query->where('nama_lokasi', 'like', "%$search%");
             });
         }
-
+        
+        $lokasi->orderBy('created_at', 'desc');
         $lokasis = $lokasi->whereNull('parent_id')->paginate($request->perpage ?? 10);
         return response()->json([
             'status' => 'success',
@@ -35,13 +35,25 @@ class LokasiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $lokasis = Lokasi::all();
-        return response()->json([
-            'message' => 'Lokasi Data',
-            'data' => $lokasis,
-        ]);
+        $kode_lokasi = $request->kode_lokasi;
+        if($kode_lokasi) {
+
+            $lokasi = Lokasi::where('kode_lokasi', $kode_lokasi)->first();
+            return response()->json([
+                'message' => "data lokasi",
+                'data' => $lokasi,
+            ]);
+
+        } else {
+
+            $lokasis = Lokasi::all();
+            return response()->json([
+                'message' => "data lokasi",
+                'data' => $lokasis,
+            ]);
+        }
     }
 
     /**

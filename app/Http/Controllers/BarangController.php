@@ -10,6 +10,7 @@ use App\Models\MetodePenyusutan;
 use App\Models\Lokasi;
 use App\Models\FotoBarang;
 use App\Models\LogHistoryBarang;
+use App\Models\CheckHistoryModel;
 use App\Exports\DataBarang;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -193,6 +194,7 @@ class BarangController extends Controller
         $kondisi              = $request->kondisi;
         $pages                = $request->pages;
         $karyawan_id          = $request->karyawan_id;
+        $kode_barang          = $request->kode_barang;
 
         $barang =  Barang::query();
         if ($search) {
@@ -204,6 +206,10 @@ class BarangController extends Controller
                 $query->orWhere('masa_manfaat', 'like', "%$search%");
                 $query->orWhere('keterangan', 'like', "%$search%");
             });
+        }
+
+        if($kode_barang) {
+            $barang->where('kode_barang', $kode_barang);
         }
 
         if($karyawan_id) {
@@ -381,6 +387,7 @@ class BarangController extends Controller
     public function update(Request $request, $id)
     {
         $barang = Barang::whereUuid($id)->first();
+        $is_check_barang = $request->is_check_barang;
 
         if (!$barang) {
             return response()->json([
@@ -435,6 +442,27 @@ class BarangController extends Controller
                 }
 
                 FotoBarang::insert($images);
+            }
+
+            if ($is_check_barang == true) {
+                $today = now()->format('Y-m-d');
+                $checkHistory = CheckHistoryModel::where('barang_id', $barang->id)->whereDate('created_at', $today)->first();
+        
+                if ($checkHistory) {
+                    $checkHistory->update([
+                        'kondisi' => $request->kondisi,
+                        'updated_at' => now(),
+                    ]);
+                } else {
+                    CheckHistoryModel::create([
+                        'lokasi_id' => $barang->lokasi_id,
+                        'barang_id' => $barang->id,
+                        'kondisi' => $request->kondisi,
+                        'created_at' => now()
+                    ]);
+                }
+
+                $barang->update(['check_date' => $today]);
             }
 
             // Log history of barang update
