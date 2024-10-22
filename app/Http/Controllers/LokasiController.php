@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
 
 class LokasiController extends Controller
 {
@@ -17,14 +18,14 @@ class LokasiController extends Controller
     {
         // list all
         $search = $request->search;
-
         $lokasi =  Lokasi::query()->with('children');
         if ($search) {
             $lokasi->where(function ($query) use ($search) {
                 $query->where('nama_lokasi', 'like', "%$search%");
             });
         }
-
+        
+        $lokasi->orderBy('created_at', 'desc');
         $lokasis = $lokasi->whereNull('parent_id')->paginate($request->perpage ?? 10);
         return response()->json([
             'status' => 'success',
@@ -35,13 +36,25 @@ class LokasiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $lokasis = Lokasi::all();
-        return response()->json([
-            'message' => 'Lokasi Data',
-            'data' => $lokasis,
-        ]);
+        $kode_lokasi = $request->kode_lokasi;
+        if($kode_lokasi) {
+
+            $lokasi = Lokasi::where('kode_lokasi', $kode_lokasi)->first();
+            return response()->json([
+                'message' => "data lokasi",
+                'data' => $lokasi,
+            ]);
+
+        } else {
+
+            $lokasis = Lokasi::all();
+            return response()->json([
+                'message' => "data lokasi",
+                'data' => $lokasis,
+            ]);
+        }
     }
 
     /**
@@ -52,16 +65,26 @@ class LokasiController extends Controller
         try {
             DB::beginTransaction();
 
+            $validatedData = $request->validate([
+                'nama_lokasi' => 'required|string|max:255',
+                'kode_lokasi' => 'required|string|max:255|unique:lokasi,kode_lokasi',
+                'parent_id' => 'nullable|integer',
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            ]);
+
             $existingLocation = Lokasi::where('kode_lokasi', $request->kode_lokasi)->first();
             if ($existingLocation) {
                 throw ValidationException::withMessages(['kode_lokasi' => ['Kode lokasi sudah digunakan']]);
             }
 
+            $fotoPath = $request->file('foto')->store('lokasi', 'public');
             $lokasi = Lokasi::create([
                 'uuid' => Uuid::uuid4(),
                 'nama_lokasi' => $request->nama_lokasi,
                 'kode_lokasi' => $request->kode_lokasi,
                 'parent_id' => $request->parent_id,
+                'path' => $fotoPath,
+                'foto' => asset('storage/' . $fotoPath)
             ]);
 
             DB::commit();
@@ -107,24 +130,34 @@ class LokasiController extends Controller
                 ]
             ]);
 
+            // Update foto jika ada
+            if ($request->hasFile('foto')) {
+                if ($lokasi->path && Storage::disk('public')->exists($lokasi->path)) {
+                    Storage::disk('public')->delete($lokasi->path);
+                }
+
+                $fotoPath      = $request->file('foto')->store('lokasi', 'public');
+                $lokasi->path  = $fotoPath;
+                $lokasi->foto  = asset('storage/' . $fotoPath);
+            }
+
             $lokasi->update([
                 'uuid' => Uuid::uuid4(),
                 'nama_lokasi' => $request->nama_lokasi,
                 'kode_lokasi' => $request->kode_lokasi,
                 'parent_id' => $request->parent_id,
-
             ]);
 
             DB::commit();
             return response()->json([
-                'message' => 'Create lokasi Success',
+                'message' => 'update lokasi Success',
                 'data' => new LokasiResource($lokasi),
             ]);
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Create lokasi Error',
-                'data' => '',
+                'message' => 'update lokasi Error',
+                'data' => $th->getMessage()
             ], 400);
         }
     }
@@ -149,6 +182,10 @@ class LokasiController extends Controller
                     'message' => 'Lokasi Gagal Dihapus, karna masih memiliki barang',
                 ], 400);
             } else {
+                if ($lokasi->path && Storage::disk('public')->exists($lokasi->path)) {
+                    Storage::disk('public')->delete($lokasi->path);
+                }
+                
                 $lokasi->delete();
             }
 

@@ -27,7 +27,9 @@ class Barang extends Model
         'kategori_barang_id',
         'lokasi_id',
         'metode_penyusutan_id',
-        'user_created'
+        'karyawan_id',
+        'user_created',
+        'check_date'
     ];
     protected $attributes = [
         'status' => 1
@@ -120,11 +122,6 @@ class Barang extends Model
         return $this->kategori?->nama_kategori ?? '-';
     }
 
-    // public function getRiwayatPengecekanAttribute()
-    // {
-    //     return $this->jadwals()->get();
-    // }
-
     public function getNamaPenyusutanAttribute()
     {
         return $this->metodePenyusutan?->nama_penyusutan ?? '-';
@@ -133,5 +130,15 @@ class Barang extends Model
     public function getUserCreatedNameAttribute()
     {
         return $this->userCreated?->name ?? '-';
+    }
+
+    public function karyawan()
+    {
+        return $this->belongsTo(Employe::class, "karyawan_id");
+    }
+
+    public function checkHistories()
+    {
+        return $this->hasMany(CheckHistoryModel::class, 'barang_id');
     }
 }

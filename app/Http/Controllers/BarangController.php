@@ -10,6 +10,7 @@ use App\Models\MetodePenyusutan;
 use App\Models\Lokasi;
 use App\Models\FotoBarang;
 use App\Models\LogHistoryBarang;
+use App\Models\CheckHistoryModel;
 use App\Exports\DataBarang;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -191,7 +192,9 @@ class BarangController extends Controller
         $metode_penyusutan_id = $request->metode_penyusutan_id;
         $tahun_perolehan      = $request->tahun_perolehan;
         $kondisi              = $request->kondisi;
-        $pages                = $request->pagesl;
+        $pages                = $request->pages;
+        $karyawan_id          = $request->karyawan_id;
+        $kode_barang          = $request->kode_barang;
 
         $barang =  Barang::query();
         if ($search) {
@@ -203,6 +206,14 @@ class BarangController extends Controller
                 $query->orWhere('masa_manfaat', 'like', "%$search%");
                 $query->orWhere('keterangan', 'like', "%$search%");
             });
+        }
+
+        if($kode_barang) {
+            $barang->where('kode_barang', $kode_barang);
+        }
+
+        if($karyawan_id) {
+            $barang->where('karyawan_id', $karyawan_id);
         }
 
         if($kondisi) {
@@ -315,6 +326,7 @@ class BarangController extends Controller
                 'kategori_barang_id' => $request->kategori_barang_id,
                 'lokasi_id' => $request->lokasi_id,
                 'metode_penyusutan_id' => $request->metode_penyusutan_id ?? 0,
+                'karyawan_id' => $request->karyawan_id,
                 'user_created' => auth()->user()->id,
             ]);
 
@@ -358,7 +370,7 @@ class BarangController extends Controller
      */
     public function show($id)
     {
-        $kategori = Barang::with(['fotoBarang', 'jadwals'])->whereUuid($id)->first();
+        $kategori = Barang::with(['fotoBarang', 'jadwals', 'karyawan'])->whereUuid($id)->first();
         return response()->json([
             'message' => 'Barang Data',
             'data' => new BarangResource($kategori),
@@ -375,64 +387,85 @@ class BarangController extends Controller
     public function update(Request $request, $id)
     {
         $barang = Barang::whereUuid($id)->first();
-        if(!$barang){
+        $is_check_barang = $request->is_check_barang;
+
+        if (!$barang) {
             return response()->json([
                 'message' => 'Barang tidak ditemukan',
             ], 404);
         }
-        
-        $request->validate([
-            'kode_barang' => [
-                'required',
-                'string',
-                Rule::unique('barang', 'kode_barang')->ignore($barang->id),
-            ]
-        ]);
-
-        $request->validate([
-            'kode_barang_resmi' => [
-                'required',
-                'string',
-                Rule::unique('barang', 'kode_barang_resmi')->ignore($barang->id),
-            ]
-        ]);
 
         try {
             DB::beginTransaction();
-            $newBarang = $barang;
-            $barang->update([
-                'nama_barang' => $request->nama_barang,
-                'kode_barang' => $request->kode_barang,
-                'kode_barang_resmi' => $request->kode_barang_resmi,
-                'kondisi' => $request->kondisi,
-                'nilai_perolehan' => $request->nilai_perolehan,
-                'nilai_pertahun' => $request->nilai_pertahun,
-                'tahun_pembelian' => $request->tahun_pembelian,
-                'masa_manfaat' => $request->masa_manfaat,
-                'keterangan' => $request->keterangan,
-                'penyusutan_barang' => $request->penyusutan_barang,
-                'kategori_barang_id' => $request->kategori_barang_id,
-                'lokasi_id' => $request->lokasi_id,
-                'metode_penyusutan_id' => $request->metode_penyusutan_id,
+
+            // Validate kode_barang only if it's different from the current value
+            $request->validate([
+                'kode_barang' => [
+                    'sometimes',
+                    'required',
+                    'string',
+                    Rule::unique('barang', 'kode_barang')->ignore($barang->id)->where(function ($query) use ($request, $barang) {
+                        return $query->where('kode_barang', $request->kode_barang)->where('id', '<>', $barang->id);
+                    }),
+                ],
             ]);
 
+            // Validate kode_barang_resmi only if it's different from the current value
+            $request->validate([
+                'kode_barang_resmi' => [
+                    'sometimes',
+                    'required',
+                    'string',
+                    Rule::unique('barang', 'kode_barang_resmi')->ignore($barang->id)->where(function ($query) use ($request, $barang) {
+                        return $query->where('kode_barang_resmi', $request->kode_barang_resmi)->where('id', '<>', $barang->id);
+                    }),
+                ],
+            ]);
 
-            if (isset($request->images) && is_array($request->images)) {
-                $images  = [];
-                foreach ($request->images as $image) {
+            // Update barang attributes
+            $barang->update($request->all());
+
+            // Handle images upload if present
+            if ($request->hasFile('images')) {
+                $images = [];
+
+                foreach ($request->file('images') as $image) {
                     $file = Storage::disk('public')->put('barang', $image);
                     $images[] = [
                         'uuid' => Uuid::uuid4(),
                         'barang_id' => $barang->id,
                         'lokasi_foto' => $file,
                         'foto_barang' => asset('storage/' . $file),
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ];
                 }
+
                 FotoBarang::insert($images);
             }
 
+            if ($is_check_barang == true) {
+                $today = now()->format('Y-m-d');
+                $checkHistory = CheckHistoryModel::where('barang_id', $barang->id)->whereDate('created_at', $today)->first();
+        
+                if ($checkHistory) {
+                    $checkHistory->update([
+                        'kondisi' => $request->kondisi,
+                        'updated_at' => now(),
+                    ]);
+                } else {
+                    CheckHistoryModel::create([
+                        'lokasi_id' => $barang->lokasi_id,
+                        'barang_id' => $barang->id,
+                        'kondisi' => $request->kondisi,
+                        'created_at' => now()
+                    ]);
+                }
+
+                $barang->update(['check_date' => $today]);
+            }
+
+            // Log history of barang update
             LogHistoryBarang::create([
                 'user_updated' => auth()->user()->id,
                 'barang_id' => $barang->id,
@@ -441,17 +474,17 @@ class BarangController extends Controller
 
             DB::commit();
 
+            // Return success response with updated barang data
             return response()->json([
                 'message' => 'Update Barang Success',
-                'data' => new BarangResource(Barang::find($barang->id)),
+                'data' => new BarangResource($barang),
             ]);
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json([
                 'message' => 'Update Barang Error',
-                'data' => '',
                 'error' => $th->getMessage(),
-                'request' => $request->all()
+                'request' => $request->all(),
             ], 400);
         }
     }
@@ -498,7 +531,6 @@ class BarangController extends Controller
             ], 400);
         }
     }
-
     /**
      * Update the specified resource in storage.
      *
