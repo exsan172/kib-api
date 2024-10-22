@@ -10,7 +10,7 @@ class Lokasi extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'lokasi';
-    protected $fillable = ['uuid', 'nama_lokasi', 'parent_id', 'kode_lokasi'];
+    protected $fillable = ['uuid', 'nama_lokasi', 'parent_id', 'kode_lokasi', 'foto', 'path'];
 
     /**
      * Get the parent that owns the Menu

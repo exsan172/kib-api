@@ -65,6 +65,7 @@ class EmployeController extends Controller
             $fotoPath = $request->file('foto')->store('photos', 'public');
             $employe  = Employe::create([
                 'foto'      => asset('storage/' . $fotoPath),
+                'path'      => $fotoPath,
                 'nama'      => $request->nama,
                 'nip'       => $request->nip,
                 'instansi'  => $request->instansi,
@@ -118,11 +119,12 @@ class EmployeController extends Controller
             
             // Update foto jika ada
             if ($request->hasFile('foto')) {
-                if ($employe->foto && Storage::disk('public')->exists($employe->foto)) {
-                    Storage::disk('public')->delete($employe->foto);
+                if ($employe->path && Storage::disk('public')->exists($employe->path)) {
+                    Storage::disk('public')->delete($employe->path);
                 }
 
                 $fotoPath       = $request->file('foto')->store('photos', 'public');
+                $employe->path  = $fotoPath;
                 $employe->foto  = asset('storage/' . $fotoPath);
             }
 
@@ -166,8 +168,8 @@ class EmployeController extends Controller
             }
 
             // Hapus foto dari storage
-            if ($employe->foto && Storage::disk('public')->exists($employe->foto)) {
-                Storage::disk('public')->delete($employe->foto);
+            if ($employe->path && Storage::disk('public')->exists($employe->path)) {
+                Storage::disk('public')->delete($employe->path);
             }
             
             // Hapus employe dari database

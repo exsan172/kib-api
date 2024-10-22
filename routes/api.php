@@ -82,6 +82,7 @@ Route::prefix('v1')->group(function () {
         Route::resource('lokasi', LokasiController::class);
         Route::post('lokasi/list', [LokasiController::class, 'list']);
         Route::delete('lokasi/{id}', [LokasiController::class, 'destroy']);
+        Route::post('lokasi/{id}', [LokasiController::class, 'update']);
 
         Route::post('barang/import', [BarangController::class, 'importDataBarang']);
         Route::post('barang/print', [BarangController::class, 'printDataBarang']);
