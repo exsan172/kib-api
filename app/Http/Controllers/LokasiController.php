@@ -22,7 +22,6 @@ class LokasiController extends Controller
         if ($search) {
             $lokasi->where(function ($query) use ($search) {
                 $query->where('nama_lokasi', 'like', "%$search%");
-                $query->orWhere('kode_lokasi', 'like', "%$search%");
             });
         }
         
