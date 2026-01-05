@@ -3,15 +3,17 @@
 namespace App\Exports;
 
 use App\Models\Barang;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class DataBarang implements FromCollection, WithHeadings
+class DataBarang implements FromQuery, WithHeadings, WithChunkReading
 {
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function collection()
+    public function query()
     {
         return Barang::select(
             'nama_barang',
@@ -25,12 +27,18 @@ class DataBarang implements FromCollection, WithHeadings
             'keterangan',
             'kategori_barang.nama_kategori AS kategori_barang',
             'lokasi.nama_lokasi AS lokasi',
-            'metode_penyusutan.nama_penyusutan AS metode_penyusutan'
+            'metode_penyusutan.nama_penyusutan AS metode_penyusutan',
+            DB::raw("COALESCE(employes.nama, '-') AS employe")
         )
         ->leftJoin('kategori_barang', 'kategori_barang.id', '=', 'barang.kategori_barang_id')
         ->leftJoin('lokasi', 'lokasi.id', '=', 'barang.lokasi_id')
         ->leftJoin('metode_penyusutan', 'metode_penyusutan.id', '=', 'barang.metode_penyusutan_id')
-        ->get();
+        ->leftJoin('employes', 'employes.id', '=', 'barang.karyawan_id');
+    }
+
+    public function chunkSize(): int
+    {
+        return 1000; // bisa 500 / 1000 / 2000
     }
 
     public function headings(): array
@@ -47,7 +55,8 @@ class DataBarang implements FromCollection, WithHeadings
             'Keterangan',          
             'Kategori Barang',  
             'Lokasi',           
-            'Metode Penyusutan' 
+            'Metode Penyusutan',
+            "Pemegang"
         ];
     }
 }
