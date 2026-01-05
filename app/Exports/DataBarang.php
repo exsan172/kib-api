@@ -13,9 +13,18 @@ class DataBarang implements FromQuery, WithHeadings, WithChunkReading
     /**
     * @return \Illuminate\Support\Collection
     */
+
+    protected $filters;
+
+    public function __construct(array $filters = [])
+    {
+        $this->filters = $filters;
+    }
+
     public function query()
     {
-        return Barang::select(
+
+        $query = Barang::select(
             'nama_barang',
             'kode_barang',
             'kode_barang_resmi',
@@ -34,6 +43,42 @@ class DataBarang implements FromQuery, WithHeadings, WithChunkReading
         ->leftJoin('lokasi', 'lokasi.id', '=', 'barang.lokasi_id')
         ->leftJoin('metode_penyusutan', 'metode_penyusutan.id', '=', 'barang.metode_penyusutan_id')
         ->leftJoin('employes', 'employes.id', '=', 'barang.karyawan_id');
+
+        /* ================= FILTER ================= */
+
+        if (!empty($this->filters['search'])) {
+            $query->where('nama_barang', 'like', '%' . $this->filters['search'] . '%');
+        }
+
+        if (!empty($this->filters['kategori_barang_id'])) {
+            $query->where('barang.kategori_barang_id', $this->filters['kategori_barang_id']);
+        }
+
+        if (!empty($this->filters['lokasi_id'])) {
+            $query->where('barang.lokasi_id', $this->filters['lokasi_id']);
+        }
+
+        if (!empty($this->filters['metode_penyusutan_id'])) {
+            $query->where('barang.metode_penyusutan_id', $this->filters['metode_penyusutan_id']);
+        }
+
+        if (!empty($this->filters['tahun_perolehan'])) {
+            $query->where('tahun_pembelian', $this->filters['tahun_perolehan']);
+        }
+
+        if (!empty($this->filters['kondisi'])) {
+            $query->where('kondisi', $this->filters['kondisi']);
+        }
+
+        if (!empty($this->filters['karyawan_id'])) {
+            $query->where('barang.karyawan_id', $this->filters['karyawan_id']);
+        }
+
+        if (!empty($this->filters['kode_barang'])) {
+            $query->where('kode_barang', 'like', '%' . $this->filters['kode_barang'] . '%');
+        }
+
+        return $query;
     }
 
     public function chunkSize(): int

@@ -110,9 +110,23 @@ class BarangController extends Controller
     public function exportDataBarang(Request $request)
     {
         try {
-            $export   = new DataBarang();
-            $fileName = 'data_barang.xlsx';
+            $export = new DataBarang(
+                collect($request->only([
+                    'search',
+                    'status',
+                    'kategori_barang_id',
+                    'lokasi_id',
+                    'metode_penyusutan_id',
+                    'tahun_perolehan',
+                    'kondisi',
+                    'karyawan_id',
+                    'kode_barang',
+                ]))
+                ->filter(fn ($value) => filled($value))
+                ->toArray()
+            );
 
+            $fileName = 'data_barang.xlsx';
             return Excel::download($export, $fileName);
 
         } catch (\Throwable $th) {
